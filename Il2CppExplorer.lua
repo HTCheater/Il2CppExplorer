@@ -1,6 +1,4 @@
---Framework to make Game Guradian scipt creation easier for games built with Unity
---To get class names, field offsets use Il2CppDumper
---https://github.com/Perfare/Il2CppDumper
+--https://github.com/HTCheater/Il2CppExplorer
 ht = {}
 --Output debug messages
 ht["debug"] = false
@@ -8,6 +6,8 @@ ht["debug"] = false
 ht["printAdvert"] = true
 --Exit if selected process isn't Unity game
 ht["exitOnNotUnityGame"] = true
+--Exit if metadata isn't loaded
+ht["exitOnEarlyStart"] = true
 --Contains start address of libil2cpp.so once either ht.getLib or ht.patchLib or ht.editFunction was called
 ht["libStart"] = 0x0
 --Contains end address of libil2cpp.so once either ht.getLib or ht.patchLib or ht.editFunction was called
@@ -49,8 +49,11 @@ end
 local isx64 = gg.getTargetInfo().x64
 local metadata = gg.getRangesList("global-metadata.dat")
 
-if (#metadata == 0 and ht.debug) then
-    print("Metadata isn't loaded, reboot the script and make sure unity game is selected")
+if #metadata == 0 then
+    if ht.exitOnEarlyStart then
+        os.exit()
+    end
+    ht.print("Metadata isn't loaded, reboot the script and make sure unity game is selected")
 end
 
 if #metadata > 0 then
@@ -197,8 +200,9 @@ function ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
         patchedBytes = patchedBytesX32
         offset = offsetX32
     end
-    if ((patchedBytes == nil or offset == nil) and ht.debug) then
-        print("❌There is no valid patch for current architecture")
+    if (patchedBytes == nil or offset == nil) then
+        ht.print("❌There is no valid patch for current architecture")
+        return
     end
     local currAddress = ht.libStart + offset
     for k, v in ipairs(patchedBytes) do
@@ -283,8 +287,8 @@ function ht.getLib()
         ht.libStart = libil2cpp.start
         ht.libEnd = libil2cpp["end"]
     end
-    if ht.libStart == 0x0 and debug then
-        print("Failed to get libil2cpp.so address, try entering the game first")
+    if ht.libStart == 0x0 then
+        ht.print("Failed to get libil2cpp.so address, try entering the game first")
     end
 end
 
@@ -292,46 +296,44 @@ end
 
 function ht.getFieldValue(instancesTable, offset, offsetX32, type, index)
     if instancesTable == nil then
-        print("❌Instances table is nil")
+        ht.print("❌Instances table is nil")
+        return nil
     end
     local instance = instancesTable[index]
-    if instance == nil and ht.debug then
-        print("❌Wrong index (no results found?)")
+    if instance == nil then
+        ht.print("❌Wrong index (no results found?)")
         return nil
     end
     if not isx64 then
         offset = offsetX32
     end
-    if offset == nil and debug then
-        print("❌Offset for this architecture is not specified")
-        return
+    if offset == nil then
+        ht.print("❌Offset for this architecture is not specified")
+        return nil
     end
-    local t = {}
-    t[1] = {}
-    t[1].address = instance.address + offset
-    t[1].flags = type
-    t = gg.getValues(t)
-    return t[1].value
+    return ht.readValue(instance.address + offset, type)
 end
 
 --Edit field value in instance from instances table specified by index
 
 function ht.editFieldValue(instancesTable, offset, offsetX32, type, index, value)
     if instancesTable == nil then
-        print("❌Instances table is nil")
+        ht.print("❌Instances table is nil")
+        return nil
     end
     local instance = instancesTable[index]
-    if instance == nil and ht.debug then
-        print("❌Wrong index (no results found?)")
-        return
+    if instance == nil then
+        ht.print("❌Wrong index (no results found?)")
+        return nil
     end
     if not isx64 then
         offset = offsetX32
     end
-    if offset == nil and debug then
-        print("❌Offset for this architecture is not specified")
-        return
+    if offset == nil then
+        ht.print("❌Offset for this architecture is not specified")
+        return nil
     end
+
     local t = {}
     t[1] = {}
     t[1].address = instance.address + offset
@@ -365,15 +367,12 @@ function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
     gg.refineNumber(stringBytes[1], gg.TYPE_BYTE)
 
     if gg.getResultsCount() == 0 then
-        if debug then
-            print("Can't find " .. functionName .. " in metadata")
-        end
-
+        ht.print("Can't find " .. functionName .. " in metadata")
         local r = {}
         return r
     end
 
-	local addr = 0x0
+    local addr = 0x0
 
     for index, result in pairs(gg.getResults(100000)) do
         for k, v in pairs(gg.getRangesList("libc_malloc")) do
@@ -404,9 +403,7 @@ function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
     end
 
     if addr == 0 then
-        if debug then
-            print("There is no valid pointer for " .. className)
-        end
+        ht.print("There is no valid pointer for " .. className)
         return
     end
 
@@ -416,7 +413,7 @@ function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 
     addr = addr - ht.libStart
 
-	ht.patchLib(addr, addr, patchedBytes, patchedBytesX32)
+    ht.patchLib(addr, addr, patchedBytes, patchedBytesX32)
 end
 
 function ht.isFunctionPointer(address, className)
@@ -472,7 +469,7 @@ function ht.readValue(addr, type)
     return t[1].value
 end
 
---returns DWORD value
+--returns dword value
 function ht.readInt(addr)
     return ht.readValue(addr, gg.TYPE_DWORD)
 end
@@ -485,4 +482,11 @@ end
 --returns pointed address
 function ht.readPointer(addr)
     return ht.readValue(addr, isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD)
+end
+
+--Print debug messages
+function ht.print(str)
+    if ht.debug then
+        print(str)
+    end
 end
