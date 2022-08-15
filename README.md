@@ -4,7 +4,7 @@ Il2CppExplorer is a [Game Guardian](https://gameguardian.net/download) framework
 
 ## Installation
 
-You can download the Il2CppExplorer.lua and write your code after mine or use this code in your script:
+You can download the Il2CppExplorer.lua and write your code after mine or use preferred way and add this code to start of your script:
 
 ```lua
 --With simple integrity check
