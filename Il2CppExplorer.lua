@@ -6,8 +6,6 @@ ht["debug"] = false
 ht["printAdvert"] = true
 --Exit if selected process isn't Unity game
 ht["exitOnNotUnityGame"] = true
---Exit if metadata isn't loaded
-ht["exitOnEarlyStart"] = true
 --Contains start address of libil2cpp.so once either ht.getLib or ht.patchLib or ht.editFunction was called
 ht["libStart"] = 0x0
 --Contains end address of libil2cpp.so once either ht.getLib or ht.patchLib or ht.editFunction was called
@@ -49,18 +47,11 @@ end
 local isx64 = gg.getTargetInfo().x64
 local metadata = gg.getRangesList("global-metadata.dat")
 
-if #metadata == 0 then
-    if ht.exitOnEarlyStart then
-        os.exit()
-    end
-    ht.print("Metadata isn't loaded, reboot the script and make sure unity game is selected")
-end
-
 if #metadata > 0 then
     metadata = metadata[1]
 end
 
-function setAllRanges()
+function ht.setAllRanges()
     gg.setRanges(
         gg.REGION_JAVA_HEAP | gg.REGION_C_HEAP | gg.REGION_C_ALLOC | gg.REGION_C_DATA | gg.REGION_C_BSS |
             gg.REGION_PPSSPP |
@@ -113,7 +104,7 @@ end
 --Get instances of class. Returns table with search results or empty table.
 
 function ht.getInstances(classname)
-    setAllRanges()
+    ht.setAllRanges()
     gg.clearResults()
     local stringBytes = gg.bytes(classname, "UTF-8")
     local searchStr = "0"
@@ -345,7 +336,7 @@ end
 --Find function offset and edit assembly
 --className should be specified to prevent finding wrong functions with the same name
 function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
-    setAllRanges()
+    ht.setAllRanges()
     gg.clearResults()
     local stringBytes = gg.bytes(functionName, "UTF-8")
     local searchStr = "0"
