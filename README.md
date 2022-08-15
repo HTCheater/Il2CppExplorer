@@ -74,19 +74,21 @@ init()
 ## Usage
 
 ### Fields
-```lua
---Default value is false
-ht.debug --Control debug messages output, recommended to set value to true if you are developing script
---Default value is true
-ht.printAdvert --Let user know what are you using :D
---Default value is true
-ht.exitOnNotUnityGame --Exit if selected process isn't a Unity game, **it isn't recommended to change**
---Default value is 0
-ht.libStart --Get start address of libil2cpp.so, works with splitted apk
---Default value is 0
-ht.libEnd --Get end address of libil2cpp.so, doesn't support splitted apk well
-```
-
+#### ht.debug
+Control debug messages output, recommended to set value to true if you are developing script.
+Default value is false
+#### ht.printAdvert
+Let user know what are you using :D.
+Default value is true
+#### ht.exitOnNotUnityGame
+Exit if selected process isn't a Unity game, **it isn't recommended to change**.
+Default value is true
+#### ht.libStart
+Get start address of libil2cpp.so, works with splitted apk
+Default value is 0
+#### ht.libEnd
+Get end address of libil2cpp.so, doesn't support splitted apk well
+Default value is 0
 ### General functions
 
 #### ht.getInstances(className)
@@ -154,7 +156,6 @@ ht.patchLib(0x19CFDA, nil, {-698416192})
 Get whether libil2cpp.so is 64-bit
 #### ht.getLib()
 Run if you need ht.libStart or ht.libEnd before you called either ht.editFunction or ht.isLibX64 or ht.patchLib
-
 
 ## Contributing
 Pull requests are welcome.
