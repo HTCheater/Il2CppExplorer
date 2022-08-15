@@ -4,10 +4,11 @@ Il2CppExplorer is a [Game Guardian](https://gameguardian.net/download) framework
 
 ## Installation
 
-You can download the Il2CppExplorer.lua and write your code after mine or use preferred way and add this code to start of your script:
+You can download the Il2CppExplorer.lua and write your code after mine or use preferred way by adding this code to start of your script:
 
 ```lua
 --With simple integrity check
+--Don't change the path, so other scripts using framework can access it too
 function init()
     local file = io.open(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua', 'r')
 
@@ -51,6 +52,7 @@ or if you don't want to check script integrity and recieve updates
 
 ```lua
 --Without simple integrity check
+--Don't change the path, so other scripts using framework can access it too
 function init()
     local file = io.open(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua', 'r')
 
