@@ -34,7 +34,8 @@ function init()
             checksum = checksum + file:read(1):byte()
         end
         if (checksumResponse.content ~= tostring(checksum)) then
-            os.exit()
+            os.remove(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua')
+            init()
         end
     end
     file:close()
