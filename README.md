@@ -126,7 +126,7 @@ Edit field's value
 ht.editFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
 ```
 ### ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
-Edit assembly of function. You should specify className to prevent finding functions with the same name. At least one instance of target class must be created to find offset. If 1st parameter is nil, class name will be ignored (can boost search speed)  
+Edit assembly of function. You should specify className to prevent finding functions with the same name. Target class must be loaded in memory to find offset (e. g. you need to enter game to modificate heal points methods). If 1st parameter is nil, class name will be ignored (can boost search speed)  
 Put nil if you don't want to specify information for some architecture.  
 patchedBytes is a table that can contain either numbers or strings with opcodes or strings with hex (must start with h)  
 **Parameters:**  
