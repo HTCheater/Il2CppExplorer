@@ -1,5 +1,5 @@
 --https://github.com/HTCheater/Il2CppExplorer
-if (ht == nil or type(ht) ~= table) then
+if (ht == nil or type(ht) ~= 'table') then
     ht = {}
 end
 --Output debug messages
