@@ -159,7 +159,7 @@ ht.patchLib(0x19CFDA, nil, {-698416192})
 Run if you need ht.libStart or ht.libEnd before you called either ht.editFunction or ht.patchLib
 
 # Problems
-32-bit support isn't ready yet
+Needs testing on 32-bit devices
 
 # Contributing
 Pull requests are welcome.
