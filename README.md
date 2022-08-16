@@ -48,7 +48,7 @@ end
 init()
 ```
 
-or if you don't want to check script integrity and recieve updates
+or use this if you don't want to check script integrity and recieve updates
 
 ```lua
 --Without simple integrity check
@@ -90,66 +90,66 @@ Default value is true
 Get start address of libil2cpp.so, works with splitted apk.  
 Default value is 0
 #### ht.libEnd
-Get end address of libil2cpp.so, doesn't support splitted apk well
+Get end address of libil2cpp.so, doesn't support splitted apk well.  
 Default value is 0
 ### General functions
 
 #### ht.getInstances(className)
-Returns a table with search results
-**Parameters:**
-1st parameter is a string
+Returns a table with search results  
+**Parameters:**  
+1st parameter is a string  
 **Example:**
 ```lua
 ht.getInstances('RGHand')
 ```
 #### ht.getFieldValue(instancesTable, offset, offsetX32, type, index)
-Get field's value
-**Parameters:**
-1st parameter is return value of ht.getInstances
-2nd parameter is offset for 64-bit architecture
-3rd parameter is offset for 32-bit architecture
-4th parameter is one of gg.TYPE_\*
-5th parameter is desired index
+Get field's value  
+**Parameters:**  
+1st parameter is return value of ht.getInstances  
+2nd parameter is offset for 64-bit architecture  
+3rd parameter is offset for 32-bit architecture  
+4th parameter is one of gg.TYPE_\*  
+5th parameter is desired index  
 **Example:**
 ```lua
 ht.getFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1)
 ```
 #### ht.editFieldValue(instancesTable, offset, offsetX32, type, index, value)
-Edit field's value
-**Parameters:**
-1st parameter is return value of ht.getInstances
-2nd parameter is offset for 64-bit architecture
-3rd parameter is offset for 32-bit architecture
-4th parameter is one of gg.TYPE_\*
-5th parameter is desired index
-6th parameter is value to set
+Edit field's value  
+**Parameters:**  
+1st parameter is return value of ht.getInstances  
+2nd parameter is offset for 64-bit architecture  
+3rd parameter is offset for 32-bit architecture  
+4th parameter is one of gg.TYPE_\*  
+5th parameter is desired index  
+6th parameter is value to set  
 **Example:**
 ```lua
 ht.editFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
 ```
 #### ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
-Edit assembly of function. You should specify className to prevent finding functions with the same name.
-Put nil if you don't want to specify information for some architecture.
-patchedBytes is a table that can contain either numbers or strings with opcodes or hex (must start with h)
-**Parameters:**
-1st parameter is name of class
-2nd parameter is name of function located in the classs
-3rd parameter is values table for 64-bit architecture
-4th parameter is values table for 32-bit architecture
+Edit assembly of function. You should specify className to prevent finding functions with the same name.  
+Put nil if you don't want to specify information for some architecture.  
+patchedBytes is a table that can contain either numbers or strings with opcodes or hex (must start with h)  
+**Parameters:**  
+1st parameter is name of class  
+2nd parameter is name of function located in the classs  
+3rd parameter is values table for 64-bit architecture  
+4th parameter is values table for 32-bit architecture  
 **Example:**
 ```lua
 ht.editFunction(nil, 'get_hp', {'MOV X0, #99999', 'RET'})
 ```
 #### ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
-CONSIDER USING ht.editFunction!
-Edit assembly in libil2cpp.so.
-Put nil if you don't want to specify information for some architecture.
-patchedBytes is a table that can contain either numbers or strings with opcodes or hex (must start with h)
-**Parameters:**
-1st parameter is offset for 64-bit architecture
-2nd parameter is offset for 32-bit architecture
-3rd parameter is values table for 64-bit architecture
-4th parameter is values table for 32-bit architecture
+CONSIDER USING ht.editFunction!  
+Edit assembly in libil2cpp.so.  
+Put nil if you don't want to specify information for some architecture.  
+patchedBytes is a table that can contain either numbers or strings with opcodes or hex (must start with h)  
+**Parameters:**  
+1st parameter is offset for 64-bit architecture  
+2nd parameter is offset for 32-bit architecture  
+3rd parameter is values table for 64-bit architecture  
+4th parameter is values table for 32-bit architecture  
 **Example:**
 ```lua
 ht.patchLib(0x19CFDA, 0x9DFCA, {'RET'}, {'h1EFF2FE1'})
