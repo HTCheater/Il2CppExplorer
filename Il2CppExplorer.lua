@@ -81,7 +81,7 @@ function ht.isClassPointer(address)
         return false
     end
 
-    t[1].address = address - (isx64 and 0x8 or 0x6)
+    t[1].address = address - (isx64 and 0x8 or 0x4)
     t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
     gg.clearResults()
     gg.loadResults(t)
@@ -90,7 +90,7 @@ function ht.isClassPointer(address)
         return false
     end
 
-    t[1].address = address + (isx64 and 0x8 or 0x6)
+    t[1].address = address + (isx64 and 0x8 or 0x4)
     t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
     gg.clearResults()
     gg.loadResults(t)
@@ -403,7 +403,7 @@ function ht.isFunctionPointer(address, className)
         return false
     end
 
-    t[1].address = address - (isx64 and 0x8 or 0x6)
+    t[1].address = address - (isx64 and 0x8 or 0x4)
     t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
     gg.clearResults()
     gg.loadResults(t)
@@ -412,16 +412,16 @@ function ht.isFunctionPointer(address, className)
         return false
     end
 
-    t[1].address = address + (isx64 and 0x8 or 0x6)
+    t[1].address = address + (isx64 and 0x8 or 0x4)
     t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
     gg.clearResults()
     gg.loadResults(t)
-    t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, gg.POINTER_WRITABLE)
+    t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, isx64 and gg.POINTER_WRITABLE)
     if t[1] == nil then
         return false
     end
     if className ~= nil then
-        currAddr = ht.readPointer(ht.readPointer(address + (isx64 and 0x8 or 0x6)) + (isx64 and 0x10 or 0x8))
+        currAddr = ht.readPointer(ht.readPointer(address + (isx64 and 0x8 or 0x4)) + (isx64 and 0x10 or 0x8))
         classBytes = gg.bytes(className, "UTF-8")
         for k, v in pairs(classBytes) do
             if (v ~= ht.readByte(currAddr)) then
