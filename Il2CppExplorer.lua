@@ -1,7 +1,11 @@
 --https://github.com/HTCheater/Il2CppExplorer
-ht = {}
+if (ht == nil or type(ht) ~= table) then
+    ht = {}
+end
 --Output debug messages
-ht["debug"] = false
+if ht.debug == nil then
+    ht["debug"] = false
+end
 --Let people know you are using my framework :D
 if (ht.printAdvert == nil) then
     ht["printAdvert"] = true
