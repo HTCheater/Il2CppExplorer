@@ -160,8 +160,8 @@ Get whether libil2cpp.so is 64-bit
 ### ht.getLib()
 Run if you need ht.libStart or ht.libEnd before you called either ht.editFunction or ht.isLibX64 or ht.patchLib
 
-## Problems
+# Problems
 32-bit support isn't ready yet
 
-## Contributing
+# Contributing
 Pull requests are welcome.
