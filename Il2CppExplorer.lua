@@ -237,7 +237,8 @@ function ht.getLib()
     for i, range in pairs(ranges) do
         gg.searchNumber(
         "47;108;105;98;105;108;50;99;112;112;46;115;111;0::14",
-        gg.TYPE_BYTE, false,
+        gg.TYPE_BYTE,
+        false,
         gg.SIGN_EQUAL,
         range['start'],
         range['end'],
@@ -258,8 +259,17 @@ function ht.getLib()
                 gg.clearResults()
                 gg.loadResults(t)
                 gg.searchPointer(0, v['start'], v['end'])
-                if (gg.getResultsCount() ~= 0) then
-                    ht.libStart = ht.readPointer(gg.getResults(1)[1].address - (isx64 and 0x8 or 0x4))
+                for index, res in pairs(gg.getResults(1)) do
+                    local t = {}
+                    t[1] = {}
+                    t[1].address = res.address - (isx64 and 0x8 or 0x4)
+                    t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+                    gg.loadResults(t)
+                    local pointers = gg.getResults(1, 0, nil, nil, nil, nil, nil, nil, gg.POINTER_EXECUTABLE)
+                    if #pointers ~= 0 then
+                        ht.libStart = ht.readPointer(t[1].address)
+                        break
+                    end
                 end
             end
             break
