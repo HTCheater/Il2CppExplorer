@@ -16,8 +16,6 @@ if (ht.exitOnNotUnityGame == nil) then
 end
 --Contains start address of libil2cpp.so once either ht.getLib or ht.patchLib or ht.editFunction was called
 ht["libStart"] = 0x0
---Contains end address of libil2cpp.so once either ht.getLib or ht.patchLib or ht.editFunction was called
-ht["libEnd"] = 0x0
 
 if ht.printAdvert then
     print("✨Made with Ill2CppExplorer by HTCheater")
@@ -176,7 +174,7 @@ function ht.getInstances(classname)
     gg.loadResults(r)
     gg.searchPointer(0)
     r = gg.getResults(100000)
-    if gg.getResultsCount == 0 and debug then
+    if gg.getResultsCount() == 0 and debug then
         print("There are no instances for the " .. classname .. ", try to load the class first")
     end
     gg.clearResults()
@@ -225,50 +223,47 @@ function ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
     end
 end
 
---Call ht.getLib in case you need access to ht.libStart or ht.libEnd.
+--Call ht.getLib in case you need access to ht.libStart
 
 function ht.getLib()
+    ht.setAllRanges()
     local libil2cpp
     if gg.getRangesList("libil2cpp.so")[1] ~= nil then
         ht.libStart = gg.getRangesList("libil2cpp.so")[1].start
-        ht.libEnd = gg.getRangesList("libil2cpp.so")[1]["end"]
-    else
-        local apkconf = gg.getRangesList("/data/app/*split_config.arm*.apk")
-        local k = 1
-        libs = {}
-        for i, lib in ipairs(apkconf) do
-            if lib["state"] == "Xa" and lib["type"] == "r-xp" then
-                libs[k] = lib
-                k = k + 1
+        return
+    end
+
+    local ranges = gg.getRangesList("bionic_alloc_small_objects")
+    for i, range in pairs(ranges) do
+        gg.searchNumber(
+        "47;108;105;98;105;108;50;99;112;112;46;115;111;0::14",
+        gg.TYPE_BYTE, false,
+        gg.SIGN_EQUAL,
+        range['start'],
+        range['end'],
+        1)
+        gg.refineNumber("47", gg.TYPE_BYTE)
+        if gg.getResultsCount() ~= 0 then
+            local str = gg.getResults(1)[1]
+            gg.clearResults()
+            addr = str.address
+            while ht.readByte(addr) ~= 0 do
+                addr = addr - 1
             end
-        end
-
-        local diff = 0
-
-        for i, lib in ipairs(libs) do
             local t = {}
             t[1] = {}
-            t[1].address = lib["start"]
+            t[1].address = addr + 1
             t[1].flags = gg.TYPE_BYTE
-            t[2] = {}
-            t[2].address = lib["start"] + 1
-            t[2].flags = gg.TYPE_BYTE
-            t[3] = {}
-            t[3].address = lib["start"] + 2
-            t[3].flags = gg.TYPE_BYTE
-            t[4] = {}
-            t[4].address = lib["start"] + 3
-            t[4].flags = gg.TYPE_BYTE
-            local r = gg.getValues(t)
-            if r[1]["value"] == 127 and r[2]["value"] == 69 and r[3]["value"] == 76 and r[4]["value"] == 70 then
-                if (lib["end"] - lib["start"]) > diff then
-                    diff = (lib["end"] - lib["start"]) + 0.0
-                    libil2cpp = lib
+            for k, v in pairs(gg.getRangesList("linker_alloc")) do
+                gg.clearResults()
+                gg.loadResults(t)
+                gg.searchPointer(0, v['start'], v['end'])
+                if (gg.getResultsCount() ~= 0) then
+                    ht.libStart = ht.readPointer(gg.getResults(1)[1].address - (isx64 and 0x8 or 0x4))
                 end
             end
+            break
         end
-        ht.libStart = libil2cpp.start
-        ht.libEnd = libil2cpp["end"]
     end
     if ht.libStart == 0x0 then
         ht.print("Failed to get libil2cpp.so address, try entering the game first")
