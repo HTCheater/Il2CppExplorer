@@ -155,10 +155,8 @@ patchedBytes is a table that can contain either numbers or strings with opcodes 
 ht.patchLib(0x19CFDA, 0x9DFCA, {'RET'}, {'h1EFF2FE1'})
 ht.patchLib(0x19CFDA, nil, {-698416192})
 ```
-### ht.isLibX64()
-Get whether libil2cpp.so is 64-bit
 ### ht.getLib()
-Run if you need ht.libStart or ht.libEnd before you called either ht.editFunction or ht.isLibX64 or ht.patchLib
+Run if you need ht.libStart or ht.libEnd before you called either ht.editFunction or ht.patchLib
 
 # Problems
 32-bit support isn't ready yet
