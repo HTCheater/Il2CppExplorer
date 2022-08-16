@@ -380,7 +380,7 @@ function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 
             for i, res in ipairs(results) do
                 if ht.isFunctionPointer(res.address, className) then
-                    addr = ht.readPointer(res.address - (isx64 and 0x10 or 0x8))
+                    addr = ht.readPointer(res.address - (isx64 and 0x8 or 0x4))
                     break
                 end
             end
