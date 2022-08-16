@@ -92,6 +92,7 @@ Default value is 0
 ## General functions
 
 ### ht.getInstances(className)
+Find instances of class.
 Returns a table with search results  
 **Parameters:**  
 1st parameter is a string  
@@ -125,7 +126,7 @@ Edit field's value
 ht.editFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
 ```
 ### ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
-Edit assembly of function. You should specify className to prevent finding functions with the same name.  
+Edit assembly of function. You should specify className to prevent finding functions with the same name. At least one instance of target class must be created to find offset. If 1st parameter is nil, class name will be ignored (can boost search speed)  
 Put nil if you don't want to specify information for some architecture.  
 patchedBytes is a table that can contain either numbers or strings with opcodes or strings with hex (must start with h)  
 **Parameters:**  
