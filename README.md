@@ -74,27 +74,27 @@ end
 init()
 ```
 
-## Usage
+# Usage
 
-### Fields
-#### ht.debug
+## Fields
+### ht.debug
 Control debug messages output, recommended to set value to true if you are developing script.  
 Default value is false
-#### ht.printAdvert
+## ht.printAdvert
 Let user know what are you using :D.  
 Default value is true
-#### ht.exitOnNotUnityGame
+### ht.exitOnNotUnityGame
 Exit if selected process isn't a Unity game, **it isn't recommended to change**.  
 Default value is true
-#### ht.libStart
+### ht.libStart
 Get start address of libil2cpp.so, works with splitted apk.  
 Default value is 0
-#### ht.libEnd
+### ht.libEnd
 Get end address of libil2cpp.so, doesn't support splitted apk well.  
 Default value is 0
-### General functions
+## General functions
 
-#### ht.getInstances(className)
+### ht.getInstances(className)
 Returns a table with search results  
 **Parameters:**  
 1st parameter is a string  
@@ -102,7 +102,7 @@ Returns a table with search results
 ```lua
 ht.getInstances('RGHand')
 ```
-#### ht.getFieldValue(instancesTable, offset, offsetX32, type, index)
+### ht.getFieldValue(instancesTable, offset, offsetX32, type, index)
 Get field's value  
 **Parameters:**  
 1st parameter is return value of ht.getInstances  
@@ -114,7 +114,7 @@ Get field's value
 ```lua
 ht.getFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1)
 ```
-#### ht.editFieldValue(instancesTable, offset, offsetX32, type, index, value)
+### ht.editFieldValue(instancesTable, offset, offsetX32, type, index, value)
 Edit field's value  
 **Parameters:**  
 1st parameter is return value of ht.getInstances  
@@ -127,7 +127,7 @@ Edit field's value
 ```lua
 ht.editFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
 ```
-#### ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
+### ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 Edit assembly of function. You should specify className to prevent finding functions with the same name.  
 Put nil if you don't want to specify information for some architecture.  
 patchedBytes is a table that can contain either numbers or strings with opcodes or hex (must start with h)  
@@ -140,7 +140,7 @@ patchedBytes is a table that can contain either numbers or strings with opcodes 
 ```lua
 ht.editFunction(nil, 'get_hp', {'MOV X0, #99999', 'RET'})
 ```
-#### ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
+### ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
 CONSIDER USING ht.editFunction!  
 Edit assembly in libil2cpp.so.  
 Put nil if you don't want to specify information for some architecture.  
@@ -155,9 +155,9 @@ patchedBytes is a table that can contain either numbers or strings with opcodes 
 ht.patchLib(0x19CFDA, 0x9DFCA, {'RET'}, {'h1EFF2FE1'})
 ht.patchLib(0x19CFDA, nil, {-698416192})
 ```
-#### ht.isLibX64()
+### ht.isLibX64()
 Get whether libil2cpp.so is 64-bit
-#### ht.getLib()
+### ht.getLib()
 Run if you need ht.libStart or ht.libEnd before you called either ht.editFunction or ht.isLibX64 or ht.patchLib
 
 ## Problems
