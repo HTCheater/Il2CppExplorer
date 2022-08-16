@@ -18,7 +18,7 @@ end
 ht["libStart"] = 0x0
 
 if ht.printAdvert then
-    print("✨Made with Ill2CppExplorer by HTCheater")
+    print("✨Made with Il2CppExplorer by HTCheater")
 end
 
 if (ht.exitOnNotUnityGame and #gg.getRangesList("global-metadata.dat") < 1) then
