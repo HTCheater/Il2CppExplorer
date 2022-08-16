@@ -401,6 +401,8 @@ function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 
     addr = addr - ht.libStart
 
+    ht.print("Offset for " .. functionName .. ": " .. addr)
+
     ht.patchLib(addr, addr, patchedBytes, patchedBytesX32)
 end
 
