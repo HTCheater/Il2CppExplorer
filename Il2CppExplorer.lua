@@ -420,7 +420,7 @@ function ht.isFunctionPointer(address, className)
     t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
     gg.clearResults()
     gg.loadResults(t)
-    t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, isx64 and gg.POINTER_WRITABLE)
+    t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, gg.POINTER_WRITABLE)
     if t[1] == nil then
         return false
     end
