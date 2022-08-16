@@ -127,7 +127,7 @@ ht.editFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
 ### ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 Edit assembly of function. You should specify className to prevent finding functions with the same name.  
 Put nil if you don't want to specify information for some architecture.  
-patchedBytes is a table that can contain either numbers or strings with opcodes or hex (must start with h)  
+patchedBytes is a table that can contain either numbers or strings with opcodes or strings with hex (must start with h)  
 **Parameters:**  
 1st parameter is name of class  
 2nd parameter is name of function located in the classs  
