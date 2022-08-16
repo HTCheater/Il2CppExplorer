@@ -89,9 +89,6 @@ Default value is true
 ### ht.libStart
 Get start address of libil2cpp.so, works with splitted apk.  
 Default value is 0
-### ht.libEnd
-Get end address of libil2cpp.so, doesn't support splitted apk well.  
-Default value is 0
 ## General functions
 
 ### ht.getInstances(className)
@@ -156,7 +153,7 @@ ht.patchLib(0x19CFDA, 0x9DFCA, {'RET'}, {'h1EFF2FE1'})
 ht.patchLib(0x19CFDA, nil, {-698416192})
 ```
 ### ht.getLib()
-Run if you need ht.libStart or ht.libEnd before you called either ht.editFunction or ht.patchLib
+Run if you need ht.libStart before you called either ht.editFunction or ht.patchLib
 
 # Problems
 Needs testing on 32-bit devices
