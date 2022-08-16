@@ -185,9 +185,8 @@ function ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
     if ht.libStart == 0 then
         ht.getLib()
     end
-    local libX64 = ht.isLibX64()
     local patch = {}
-    if not libX64 then
+    if not isx64 then
         patchedBytes = patchedBytesX32
         offset = offsetX32
     end
@@ -210,7 +209,7 @@ function ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
                 t[1].value = v
                 gg.setValues(t)
             else
-                t[1].value = (libX64 and "~A8 " or "~A ") .. v
+                t[1].value = (isx64 and "~A8 " or "~A ") .. v
                 gg.setValues(t)
             end
         end
@@ -218,22 +217,7 @@ function ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
     end
 end
 
---Get whether libil2cpp is 64-bit
-
-function ht.isLibX64()
-    if ht.libStart == 0 then
-        ht.getLib()
-    end
-    local t = {}
-    t[1] = {}
-    t[1].address = ht.libStart + 0x4
-    t[1].flags = gg.TYPE_BYTE
-    t = gg.getValues(t)
-    gg.loadResults(t)
-    return t[1].value == 2
-end
-
---Call ht.getLib in case you need access to ht.libStart or ht.libEnd. You don't need to call it if you called ht.isLibX64 or ht.patchLib
+--Call ht.getLib in case you need access to ht.libStart or ht.libEnd.
 
 function ht.getLib()
     local libil2cpp
