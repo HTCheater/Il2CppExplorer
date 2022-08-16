@@ -127,7 +127,7 @@ ht.editFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
 ```
 ### ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 Edit assembly of function. You should specify className to prevent finding functions with the same name. Target class must be loaded in memory to find offset (e. g. you are in menu, so you need to enter game at first place to modificate functions related to heal points ). If 1st parameter is nil, class name will be ignored (can boost search speed)  
-Put nil if you don't want to specify information for some architecture.  
+You can put nil in 3rd or 4th parameter if you don't want to specify information for some architecture.  
 patchedBytes is a table that can contain either numbers or strings with opcodes or strings with hex (must start with h)  
 **Parameters:**  
 1st parameter is name of class  
