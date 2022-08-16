@@ -64,8 +64,8 @@ function init()
         end
         file = io.open(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua', 'w')
         file:write(response.content)
-        file:close()
     end
+    file:close()
 
     framework = loadfile(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua')
     framework()
@@ -78,16 +78,16 @@ init()
 
 ### Fields
 #### ht.debug
-Control debug messages output, recommended to set value to true if you are developing script.
+Control debug messages output, recommended to set value to true if you are developing script.  
 Default value is false
 #### ht.printAdvert
-Let user know what are you using :D.
+Let user know what are you using :D.  
 Default value is true
 #### ht.exitOnNotUnityGame
-Exit if selected process isn't a Unity game, **it isn't recommended to change**.
+Exit if selected process isn't a Unity game, **it isn't recommended to change**.  
 Default value is true
 #### ht.libStart
-Get start address of libil2cpp.so, works with splitted apk
+Get start address of libil2cpp.so, works with splitted apk.  
 Default value is 0
 #### ht.libEnd
 Get end address of libil2cpp.so, doesn't support splitted apk well
