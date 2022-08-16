@@ -3,9 +3,13 @@ ht = {}
 --Output debug messages
 ht["debug"] = false
 --Let people know you are using my framework :D
-ht["printAdvert"] = true
+if (ht.printAdvert == nil) then
+    ht["printAdvert"] = true
+end
 --Exit if selected process isn't Unity game
-ht["exitOnNotUnityGame"] = true
+if (ht.exitOnNotUnityGame == nil) then
+    ht["exitOnNotUnityGame"] = true
+end
 --Contains start address of libil2cpp.so once either ht.getLib or ht.patchLib or ht.editFunction was called
 ht["libStart"] = 0x0
 --Contains end address of libil2cpp.so once either ht.getLib or ht.patchLib or ht.editFunction was called
