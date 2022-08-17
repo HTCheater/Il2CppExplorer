@@ -76,7 +76,7 @@ end
 --Check wether the metadata class name pointer is suitable to find instances. Returns boolean.
 
 function ht.isClassPointer(address)
-    t = {}
+    local t = {}
     t[1] = {}
     t[1].address = address - (isx64 and 0x10 or 0x8)
     t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
@@ -401,13 +401,13 @@ function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 
     addr = addr - ht.libStart
 
-    ht.print("Offset for " .. functionName .. ": " .. addr)
+    ht.print("Offset for " .. functionName .. ": " .. string.format('%X', addr))
 
     ht.patchLib(addr, addr, patchedBytes, patchedBytesX32)
 end
 
 function ht.isFunctionPointer(address, className)
-    t = {}
+    local t = {}
     t[1] = {}
     t[1].address = address - (isx64 and 0x10 or 0x8)
     t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
