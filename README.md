@@ -141,7 +141,7 @@ patchedBytes is a table that can contain either numbers or strings with opcodes 
 explorer.editFunction(nil, 'get_hp', {'MOV X0, #99999', 'RET'})
 ```
 ### explorer.getFunction(className, functionName)
-Get function offset in il2cpp.so. You should specify className to prevent finding functions with the same name. Target class must be loaded in memory to find offset (e. g. you are in menu, so you need to enter game at first place to modificate functions related to heal points ). If 1st parameter is nil, class name will be ignored (can boost search speed)
+Get function offset in il2cpp.so. You should specify className to prevent finding functions with the same name. Target class must be loaded in memory to find offset (e. g. you are in menu, so you need to enter game at first place to modificate functions related to heal points ). If 1st parameter is nil, class name will be ignored (can boost search speed)  
 **Parameters:**  
 1st parameter is name of class  
 2nd parameter is name of function located in the classs  
