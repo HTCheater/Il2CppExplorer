@@ -434,7 +434,7 @@ function explorer.readByte(addr)
     return explorer.readValue(addr, gg.TYPE_BYTE)
 end
 
-function explorer.readShort()
+function explorer.readShort(addr)
     return explorer.readValue(addr, gg.TYPE_WORD)
 end
 
