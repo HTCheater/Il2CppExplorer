@@ -13,7 +13,7 @@ function init()
     local file = io.open(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua', 'r')
 
     if file == nil then
-        response = gg.makeRequest('https://github.com/HTCheater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.lua')
+        response = gg.makeRequest('https://github.com/explorer.heater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.lua')
         if response.code ~= 200 then
             print('Check internet connection')
             os.exit()
@@ -21,7 +21,7 @@ function init()
         file = io.open(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua', 'w')
         file:write(response.content)
     else
-        checksumResponse = gg.makeRequest('https://github.com/HTCheater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.checksum')
+        checksumResponse = gg.makeRequest('https://github.com/explorer.heater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.checksum')
         if checksumResponse.code ~= 200 then
             print('Check internet connection')
             os.exit()
@@ -57,7 +57,7 @@ function init()
     local file = io.open(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua', 'r')
 
     if file == nil then
-        response = gg.makeRequest('https://github.com/HTCheater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.lua')
+        response = gg.makeRequest('https://github.com/explorer.heater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.lua')
         if response.code ~= 200 then
             print('Check internet connection')
             os.exit()
@@ -77,45 +77,45 @@ init()
 # Usage
 
 ## Fields
-### ht.debug
+### explorer.debug
 Control debug messages output, recommended to set value to true if you are developing script.  
 Default value is false
-## ht.printAdvert
+### explorer.printAdvert
 fLet user know what are you using :D. You need to set value before running the framework  
 Default value is true
-### ht.exitOnNotUnityGame
+### explorer.exitOnNotUnityGame
 Exit if selected process isn't a Unity game, **it isn't recommended to change**. You need to set value before running framework  
 Default value is true
-### ht.libStart
+### explorer.libStart
 Get start address of libil2cpp.so, works with splitted apk.  
 Default value is 0
 ## General functions
 
-### ht.getInstances(className)
+### explorer.getInstances(className)
 Find instances of class.
 Returns a table with search results  
 **Parameters:**  
 1st parameter is a string  
 **Example:**
 ```lua
-ht.getInstances('RGHand')
+explorer.getInstances('RGHand')
 ```
-### ht.getFieldValue(instancesTable, offset, offsetX32, type, index)
+### explorer.getField(instancesTable, offset, offsetX32, type, index)
 Get field's value  
 **Parameters:**  
-1st parameter is return value of ht.getInstances  
+1st parameter is return value of explorer.getInstances  
 2nd parameter is offset for 64-bit architecture  
 3rd parameter is offset for 32-bit architecture  
 4th parameter is one of gg.TYPE_\*  
 5th parameter is desired index  
 **Example:**
 ```lua
-ht.getFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1)
+explorer.getFieldValue(explorer.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1)
 ```
-### ht.editFieldValue(instancesTable, offset, offsetX32, type, index, value)
+### explorer.editField(instancesTable, offset, offsetX32, type, index, value)
 Edit field's value  
 **Parameters:**  
-1st parameter is return value of ht.getInstances  
+1st parameter is return value of explorer.getInstances  
 2nd parameter is offset for 64-bit architecture  
 3rd parameter is offset for 32-bit architecture  
 4th parameter is one of gg.TYPE_\*  
@@ -123,9 +123,9 @@ Edit field's value
 6th parameter is value to set  
 **Example:**
 ```lua
-ht.editFieldValue(ht.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
+explorer.editFieldValue(explorer.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
 ```
-### ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
+### explorer.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 Edit assembly of function. You should specify className to prevent finding functions with the same name. Target class must be loaded in memory to find offset (e. g. you are in menu, so you need to enter game at first place to modificate functions related to heal points ). If 1st parameter is nil, class name will be ignored (can boost search speed)  
 You can put nil in 3rd or 4th parameter if you don't want to specify information for some architecture.  
 patchedBytes is a table that can contain either numbers or strings with opcodes or strings with hex (must start with h)  
@@ -136,10 +136,23 @@ patchedBytes is a table that can contain either numbers or strings with opcodes 
 4th parameter is values table for 32-bit architecture  
 **Example:**
 ```lua
-ht.editFunction(nil, 'get_hp', {'MOV X0, #99999', 'RET'})
+explorer.editFunction(nil, 'get_hp', {'MOV X0, #99999', 'RET'})
 ```
-### ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
-CONSIDER USING ht.editFunction!  
+### explorer.getFunction(className, functionName)
+Get function offset in il2cpp.so. You should specify className to prevent finding functions with the same name. Target class must be loaded in memory to find offset (e. g. you are in menu, so you need to enter game at first place to modificate functions related to heal points ). If 1st parameter is nil, class name will be ignored (can boost search speed)
+**Parameters:**  
+1st parameter is name of class  
+2nd parameter is name of function located in the classs  
+3rd parameter is values table for 64-bit architecture  
+4th parameter is values table for 32-bit architecture  
+**Example:**
+```lua
+local off = explorer.getFunction(nil, 'get_hp')
+print('get_hp offset: ' .. string.format('%X', off))
+```
+
+### explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
+CONSIDER USING [explorer.editFunction](/#explorer.editFunction)!  
 Edit assembly in libil2cpp.so.  
 Put nil if you don't want to specify information for some architecture.  
 patchedBytes is a table that can contain either numbers or strings with opcodes or hex (must start with h)  
@@ -150,14 +163,45 @@ patchedBytes is a table that can contain either numbers or strings with opcodes 
 4th parameter is values table for 32-bit architecture  
 **Example:**
 ```lua
-ht.patchLib(0x19CFDA, 0x9DFCA, {'RET'}, {'h1EFF2FE1'})
-ht.patchLib(0x19CFDA, nil, {-698416192})
+explorer.patchLib(0x19CFDA, 0x9DFCA, {'RET'}, {'h1EFF2FE1'})
+explorer.patchLib(0x19CFDA, nil, {-698416192})
 ```
-### ht.getLib()
-Run if you need ht.libStart before you called either ht.editFunction or ht.patchLib
+### explorer.getLib()
+Run if you need [explorer.libStart](/#explorer.libStart) before you called either explorer.editFunction or explorer.patchLib
 
-# Problems
-Needs testing on 32-bit devices
+### explorer.readString(addr)
+Read string at desired address. If string length is too large, returns nil. You can modify maximum length in [explorer.maxStringLength](/#explorer.maxStringLength) field. If you want to read non-ASCII characters, you should check out [explorer.setAlphabet](/#explorer.setAlphabet) 
+**Parameters:**  
+1st parameter is a pointer to String instance  
+**Example:**  
+```lua
+local isx64 = gg.getTargetInfo().x64
+local ptrLength = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+local instances = explorer.getInstances('ClassWithStringField')
+local ptr = explorer.getField(instances, 0x10, 0x8, ptrLength, 1) --get pointed address
+local str = explorer.readString(address)
+print(str)
+```
 
+### explorer.setAlphabet(str)
+To read read non-ASCII characters you need to call this function.  
+**Parameters:**  
+1st parameter is a string with all needed characters  
+**Example:**  
+```lua
+local isx64 = gg.getTargetInfo().x64
+local ptrLength = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+local instances = explorer.getInstances('ClassWithStringField')
+local ptr = explorer.getField(instances, 0x10, 0x8, ptrLength, 1) --get pointed address
+
+--attemp to read string "бамбетель" without setting alphabet
+--if explorer.debug is true, you will get warnings with missing character codes
+local str = explorer.readString(address)
+print(str) --result is an empty string
+explorer.setAlphabet('АаБбВвГгҐґДдЕеЄєЖжЗзИиІіЇїЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщьЮюЯя') --ASCII characters included automatically
+--attemp to read "бамбетель" after setting alphabet
+str = explorer.readString(address)
+print(str) --result is "бамбетель"
+```
 # Contributing
 Pull requests are welcome.
