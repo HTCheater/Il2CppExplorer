@@ -89,6 +89,9 @@ Default value is true
 ### explorer.libStart
 Get start address of libil2cpp.so, works with splitted apk.  
 Default value is 0
+### explorer.maxStringLength
+Set maximum string length to read  
+Default value is 1000
 ## General functions
 
 ### explorer.getInstances(className)
