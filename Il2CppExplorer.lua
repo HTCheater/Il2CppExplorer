@@ -1,32 +1,34 @@
---https://github.com/HTCheater/Il2CppExplorer
-if (ht == nil or type(ht) ~= 'table') then
-    ht = {}
+-- https://github.com/HTCheater/Il2CppExplorer
+if (explorer == nil or type(explorer) ~= 'table') then
+    explorer = {}
 end
---Output debug messages
-if ht.debug == nil then
-    ht["debug"] = false
+-- Output debug messages
+if explorer.debug == nil then
+    explorer.debug = false
 end
---Let people know you are using my framework :D
-if (ht.printAdvert == nil) then
-    ht["printAdvert"] = true
+-- Let people know you are using my framework :D
+if (explorer.printAdvert == nil) then
+    explorer.printAdvert = true
 end
---Exit if selected process isn't Unity game
-if (ht.exitOnNotUnityGame == nil) then
-    ht["exitOnNotUnityGame"] = true
+-- Exit if selected process isn't Unity game
+if (explorer.exitOnNotUnityGame == nil) then
+    explorer.exitOnNotUnityGame = true
 end
---Contains start address of libil2cpp.so once either ht.getLib or ht.patchLib or ht.editFunction was called
-ht["libStart"] = 0x0
+-- Contains start address of libil2cpp.so once either explorer.getLib or explorer.patchLib or explorer.editFunction was called
+explorer.libStart = 0x0
+explorer.maxStringLength = 1000
+local alphabet = {}
 
-if ht.printAdvert then
+if explorer.printAdvert then
     print("✨Made with Il2CppExplorer by HTCheater")
 end
 
-if (ht.exitOnNotUnityGame and #gg.getRangesList("global-metadata.dat") < 1) then
+if (explorer.exitOnNotUnityGame and #gg.getRangesList("global-metadata.dat") < 1) then
     print("❌Please, select Unity game")
     os.exit()
 end
 
---String utils, feel free to use in your own script.
+-- String utils, feel free to use in your own script.
 
 string.startsWith = function(self, str)
     return self:find("^" .. str) ~= nil
@@ -49,7 +51,7 @@ string.removeStart = function(str, rem)
     return (str:gsub("^" .. rem .. "(.-)$", "%1"))
 end
 
---some functions
+-- some functions
 local isx64 = gg.getTargetInfo().x64
 local metadata = gg.getRangesList("global-metadata.dat")
 
@@ -57,25 +59,15 @@ if #metadata > 0 then
     metadata = metadata[1]
 end
 
-function ht.setAllRanges()
-    gg.setRanges(
-        gg.REGION_JAVA_HEAP | gg.REGION_C_HEAP | gg.REGION_C_ALLOC | gg.REGION_C_DATA | gg.REGION_C_BSS |
-            gg.REGION_PPSSPP |
-            gg.REGION_ANONYMOUS |
-            gg.REGION_JAVA |
-            gg.REGION_STACK |
-            gg.REGION_ASHMEM |
-            gg.REGION_VIDEO |
-            gg.REGION_OTHER |
-            gg.REGION_BAD |
-            gg.REGION_CODE_APP |
-            gg.REGION_CODE_SYS
-    )
+function explorer.setAllRanges()
+    gg.setRanges(gg.REGION_JAVA_HEAP | gg.REGION_C_HEAP | gg.REGION_C_ALLOC | gg.REGION_C_DATA | gg.REGION_C_BSS |
+                     gg.REGION_PPSSPP | gg.REGION_ANONYMOUS | gg.REGION_JAVA | gg.REGION_STACK | gg.REGION_ASHMEM |
+                     gg.REGION_VIDEO | gg.REGION_OTHER | gg.REGION_BAD | gg.REGION_CODE_APP | gg.REGION_CODE_SYS)
 end
 
---Check wether the metadata class name pointer is suitable to find instances. Returns boolean.
+-- Check wether the metadata class name pointer is suitable to find instances. Returns boolean.
 
-function ht.isClassPointer(address)
+function explorer.isClassPointer(address)
     local t = {}
     t[1] = {}
     t[1].address = address - (isx64 and 0x10 or 0x8)
@@ -107,10 +99,10 @@ function ht.isClassPointer(address)
     return true
 end
 
---Get instances of class. Returns table with search results or empty table.
+-- Get instances of class. Returns table with search results or empty table.
 
-function ht.getInstances(classname)
-    ht.setAllRanges()
+function explorer.getInstances(classname)
+    explorer.setAllRanges()
     gg.clearResults()
     local stringBytes = gg.bytes(classname, "UTF-8")
     local searchStr = "0"
@@ -134,21 +126,14 @@ function ht.getInstances(classname)
     local addr = 0x0
     for k, v in pairs(gg.getRangesList("libc_malloc")) do
         gg.clearResults()
-        gg.searchNumber(
-            string.format("%X", r[1].address) .. "h",
-            isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD,
-            false,
-            gg.SIGN_EQUAL,
-            v.start,
-            v["end"],
-            0
-        )
+        gg.searchNumber(string.format("%X", r[1].address) .. "h", isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD, false,
+            gg.SIGN_EQUAL, v.start, v["end"], 0)
 
         local results = gg.getResults(100)
         gg.clearResults()
 
         for i, res in ipairs(results) do
-            if ht.isClassPointer(res.address) == true then
+            if explorer.isClassPointer(res.address) == true then
                 addr = res.address
                 break
             end
@@ -181,15 +166,15 @@ function ht.getInstances(classname)
     return r
 end
 
---Patch libil2cpp.so;
---patchedBytes is a table which contains patches that can be either a dword number or a string containing opcode
---or a string containig hex (must start with "h" and contain only 4 bytes each).
---Consider using ht.editFunction
+-- Patch libil2cpp.so;
+-- patchedBytes is a table which contains patches that can be either a dword number or a string containing opcode
+-- or a string containig hex (must start with "h" and contain only 4 bytes each).
+-- Consider using explorer.editFunction
 
-function ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
+function explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
     gg.clearResults()
-    if ht.libStart == 0 then
-        ht.getLib()
+    if explorer.libStart == 0 then
+        explorer.getLib()
     end
     local patch = {}
     if not isx64 then
@@ -197,10 +182,10 @@ function ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
         offset = offsetX32
     end
     if (patchedBytes == nil or offset == nil) then
-        ht.print("❌There is no valid patch for current architecture")
+        explorer.print("❌There is no valid patch for current architecture")
         return
     end
-    local currAddress = ht.libStart + offset
+    local currAddress = explorer.libStart + offset
     for k, v in ipairs(patchedBytes) do
         local t = {}
         t[1] = {}
@@ -223,32 +208,26 @@ function ht.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
     end
 end
 
---Call ht.getLib in case you need access to ht.libStart
+-- Call explorer.getLib in case you need access to explorer.libStart
 
-function ht.getLib()
-    ht.setAllRanges()
+function explorer.getLib()
+    explorer.setAllRanges()
     local libil2cpp
     if gg.getRangesList("libil2cpp.so")[1] ~= nil then
-        ht.libStart = gg.getRangesList("libil2cpp.so")[1].start
+        explorer.libStart = gg.getRangesList("libil2cpp.so")[1].start
         return
     end
 
     local ranges = gg.getRangesList("bionic_alloc_small_objects")
     for i, range in pairs(ranges) do
-        gg.searchNumber(
-        "47;108;105;98;105;108;50;99;112;112;46;115;111;0::14",
-        gg.TYPE_BYTE,
-        false,
-        gg.SIGN_EQUAL,
-        range['start'],
-        range['end'],
-        1)
+        gg.searchNumber("47;108;105;98;105;108;50;99;112;112;46;115;111;0::14", gg.TYPE_BYTE, false, gg.SIGN_EQUAL,
+            range['start'], range['end'], 1)
         gg.refineNumber("47", gg.TYPE_BYTE)
         if gg.getResultsCount() ~= 0 then
             local str = gg.getResults(1)[1]
             gg.clearResults()
             addr = str.address
-            while ht.readByte(addr) ~= 0 do
+            while explorer.readByte(addr) ~= 0 do
                 addr = addr - 1
             end
             local t = {}
@@ -267,7 +246,7 @@ function ht.getLib()
                     gg.loadResults(t)
                     local pointers = gg.getResults(1, 0, nil, nil, nil, nil, nil, nil, gg.POINTER_EXECUTABLE)
                     if #pointers ~= 0 then
-                        ht.libStart = ht.readPointer(t[1].address)
+                        explorer.libStart = explorer.readPointer(t[1].address)
                         break
                     end
                 end
@@ -275,50 +254,50 @@ function ht.getLib()
             break
         end
     end
-    if ht.libStart == 0x0 then
-        ht.print("Failed to get libil2cpp.so address, try entering the game first")
+    if explorer.libStart == 0x0 then
+        explorer.print("Failed to get libil2cpp.so address, try entering the game first")
     end
 end
 
---Get field value in instance from instances table specified by index
+-- Get field value in instance from instances table specified by index
 
-function ht.getFieldValue(instancesTable, offset, offsetX32, type, index)
+function explorer.getField(instancesTable, offset, offsetX32, type, index)
     if instancesTable == nil then
-        ht.print("❌Instances table is nil")
+        explorer.print("❌Instances table is nil")
         return nil
     end
     local instance = instancesTable[index]
     if instance == nil then
-        ht.print("❌Wrong index (no results found?)")
+        explorer.print("❌Wrong index (no results found?)")
         return nil
     end
     if not isx64 then
         offset = offsetX32
     end
     if offset == nil then
-        ht.print("❌Offset for this architecture is not specified")
+        explorer.print("❌Offset for this architecture is not specified")
         return nil
     end
-    return ht.readValue(instance.address + offset, type)
+    return explorer.readValue(instance.address + offset, type)
 end
 
---Edit field value in instance from instances table specified by index
+-- Edit field value in instance from instances table specified by index
 
-function ht.editFieldValue(instancesTable, offset, offsetX32, type, index, value)
+function explorer.editField(instancesTable, offset, offsetX32, type, index, value)
     if instancesTable == nil then
-        ht.print("❌Instances table is nil")
+        explorer.print("❌Instances table is nil")
         return nil
     end
     local instance = instancesTable[index]
     if instance == nil then
-        ht.print("❌Wrong index (no results found?)")
+        explorer.print("❌Wrong index (no results found?)")
         return nil
     end
     if not isx64 then
         offset = offsetX32
     end
     if offset == nil then
-        ht.print("❌Offset for this architecture is not specified")
+        explorer.print("❌Offset for this architecture is not specified")
         return nil
     end
 
@@ -330,10 +309,8 @@ function ht.editFieldValue(instancesTable, offset, offsetX32, type, index, value
     gg.setValues(t)
 end
 
---Find function offset and edit assembly
---className should be specified to prevent finding wrong functions with the same name
-function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
-    ht.setAllRanges()
+function explorer.getFunction(className, functionName)
+    explorer.setAllRanges()
     gg.clearResults()
     local stringBytes = gg.bytes(functionName, "UTF-8")
     local searchStr = "0"
@@ -342,20 +319,13 @@ function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
     end
     searchStr = searchStr .. "; 0::" .. (2 + #stringBytes)
 
-    gg.searchNumber(
-        searchStr,
-        gg.TYPE_BYTE,
-        false,
-        gg.SIGN_EQUAL,
-        metadata.start,
-        metadata["end"],
-        (className == nil) and 2 or nil
-    )
+    gg.searchNumber(searchStr, gg.TYPE_BYTE, false, gg.SIGN_EQUAL, metadata.start, metadata["end"],
+        (className == nil) and 2 or nil)
     gg.refineNumber("0; " .. stringBytes[1], gg.TYPE_BYTE)
     gg.refineNumber(stringBytes[1], gg.TYPE_BYTE)
 
     if gg.getResultsCount() == 0 then
-        ht.print("Can't find " .. functionName .. " in metadata")
+        explorer.print("Can't find " .. functionName .. " in metadata")
         local r = {}
         return r
     end
@@ -365,22 +335,15 @@ function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
     for index, result in pairs(gg.getResults(100000)) do
         for k, v in pairs(gg.getRangesList("libc_malloc")) do
             gg.clearResults()
-            gg.searchNumber(
-                string.format("%X", result.address) .. "h",
-                isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD,
-                false,
-                gg.SIGN_EQUAL,
-                v.start,
-                v["end"],
-                0
-            )
+            gg.searchNumber(string.format("%X", result.address) .. "h", isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD, false,
+                gg.SIGN_EQUAL, v.start, v["end"], 0)
 
             local results = gg.getResults(100)
             gg.clearResults()
 
             for i, res in ipairs(results) do
-                if ht.isFunctionPointer(res.address, className) then
-                    addr = ht.readPointer(res.address - (isx64 and 0x10 or 0x8))
+                if explorer.isFunctionPointer(res.address, className) then
+                    addr = explorer.readPointer(res.address - (isx64 and 0x10 or 0x8))
                     break
                 end
             end
@@ -391,22 +354,29 @@ function ht.editFunction(className, functionName, patchedBytes, patchedBytesX32)
     end
 
     if addr == 0 then
-        ht.print("There is no valid pointer for " .. className)
+        explorer.print("There is no valid pointer for " .. className)
         return
     end
 
-    if ht.libStart == 0 then
-        ht.getLib()
+    if explorer.libStart == 0 then
+        explorer.getLib()
     end
 
-    addr = addr - ht.libStart
+    addr = addr - explorer.libStart
 
-    ht.print("Offset for " .. functionName .. ": " .. string.format('%X', addr))
+    explorer.print("Offset for " .. functionName .. ": " .. string.format('%X', addr))
 
-    ht.patchLib(addr, addr, patchedBytes, patchedBytesX32)
+    return addr
 end
 
-function ht.isFunctionPointer(address, className)
+-- Find function offset and edit assembly
+-- className should be specified to prevent finding wrong functions with the same name
+function explorer.editFunction(className, functionName, patchedBytes, patchedBytesX32)
+    local offs = explorer.getFunction(className, functionName)
+    explorer.patchLib(offs, offs, patchedBytes, patchedBytesX32)
+end
+
+function explorer.isFunctionPointer(address, className)
     local t = {}
     t[1] = {}
     t[1].address = address - (isx64 and 0x10 or 0x8)
@@ -436,10 +406,11 @@ function ht.isFunctionPointer(address, className)
         return false
     end
     if className ~= nil then
-        currAddr = ht.readPointer(ht.readPointer(address + (isx64 and 0x8 or 0x4)) + (isx64 and 0x10 or 0x8))
+        currAddr =
+            explorer.readPointer(explorer.readPointer(address + (isx64 and 0x8 or 0x4)) + (isx64 and 0x10 or 0x8))
         classBytes = gg.bytes(className, "UTF-8")
         for k, v in pairs(classBytes) do
-            if (v ~= ht.readByte(currAddr)) then
+            if (v ~= explorer.readByte(currAddr)) then
                 return false
             end
             currAddr = currAddr + 0x1
@@ -448,7 +419,7 @@ function ht.isFunctionPointer(address, className)
     return true
 end
 
-function ht.readValue(addr, type)
+function explorer.readValue(addr, type)
     local t = {}
     t[1] = {}
     t[1].address = addr
@@ -459,24 +430,65 @@ function ht.readValue(addr, type)
     return t[1].value
 end
 
---returns dword value
-function ht.readInt(addr)
-    return ht.readValue(addr, gg.TYPE_DWORD)
+function explorer.readByte(addr)
+    return explorer.readValue(addr, gg.TYPE_BYTE)
 end
 
---returns byte value
-function ht.readByte(addr)
-    return ht.readValue(addr, gg.TYPE_BYTE)
+function explorer.readShort()
+    return explorer.readValue(addr, gg.TYPE_WORD)
 end
 
---returns pointed address
-function ht.readPointer(addr)
-    return ht.readValue(addr, isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD)
+function explorer.readInt(addr)
+    return explorer.readValue(addr, gg.TYPE_DWORD)
 end
 
---Print debug messages
-function ht.print(str)
-    if ht.debug then
+-- returns pointed address
+function explorer.readPointer(addr)
+    return explorer.readValue(addr, isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD)
+end
+
+-- Print debug messages
+function explorer.print(str)
+    if explorer.debug then
         print(str)
     end
+end
+
+function explorer.readString(addr)
+    -- Unity uses UTF-16LE
+    local len = explorer.readInt(addr + (isx64 and 0x10 or 0x8))
+    if len > explorer.maxStringLength then
+        return nil
+    end
+    local str = ""
+    for i = 1, len, 1 do
+        local c = explorer.readShort(addr + (isx64 and 0x14 or 0xC) + (2 * (i - 1)))
+        if (c > -1 and c < 129) then
+            str = str .. string.char(c) -- works from 0 to 128
+        else
+            if (alphabet[c] ~= nil) then
+                str = str .. alphabet[c]
+            else
+                explorer.print('Warn: unrecognised character ' .. c .. '. Consider adding it to alphabet')
+            end
+        end
+    end
+    return str
+end
+
+function explorer.setAlphabet(str)
+    if (str == nil or not (type(str) == 'string')) then
+        explorer.print('Wrong argument in explorer.setAlphabet: expected string, got ' .. type(str))
+        return
+    end
+    alphabet = {}
+    str:gsub(".", function(c)
+        local bytes = gg.bytes(c, 'UTF-16LE')
+        local utf8Chars = ''
+        for k, v in pairs(bytes) do
+            utf8Chars = utf8Chars .. string.char(v)
+        end
+        local short = string.unpack("<i2", utf8Chars)
+        alphabet[short] = c
+    end)
 end
