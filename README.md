@@ -169,7 +169,7 @@ explorer.patchLib(0x19CFDA, 0x9DFCA, {'RET'}, {'h1EFF2FE1'})
 explorer.patchLib(0x19CFDA, nil, {-698416192})
 ```
 ### explorer.getLib()
-Run if you need [explorer.libStart](#explorerlibstart) before you called either explorer.editFunction or explorer.patchLib
+Run if you need [explorer.getLibStart](#explorergetLibStart) before you called either explorer.editFunction or explorer.patchLib
 
 ### explorer.readString(addr)
 Read string at desired address. If string length is too large, returns nil. You can modify maximum length in [explorer.maxStringLength](#explorermaxStringLength) field. If you want to read non-ASCII characters, you should check out [explorer.setAlphabet](#explorersetalphabetstr) 
