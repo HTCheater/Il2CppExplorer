@@ -81,7 +81,7 @@ init()
 Control debug messages output, recommended to set value to true if you are developing script.  
 Default value is false
 ### explorer.printAdvert
-fLet user know what are you using :D. You need to set value before running the framework  
+Let user know what are you using :D. You need to set value before running the framework. You need to set value before running framework  
 Default value is true
 ### explorer.exitOnNotUnityGame
 Exit if selected process isn't a Unity game, **it isn't recommended to change**. You need to set value before running framework  
