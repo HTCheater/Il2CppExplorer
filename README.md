@@ -197,7 +197,7 @@ local instances = explorer.getInstances('ClassWithStringField')
 local ptr = explorer.getField(instances, 0x10, 0x8, ptrLength, 1) --get pointed address
 
 --attemp to read string "бамбетель" without setting alphabet
---if explorer.debug is true, you will get warnings with missing character codes
+--if explorer.debug is true, you will get warnings with missing UTF-16LE character codes
 local str = explorer.readString(address)
 print(str) --result is an empty string
 explorer.setAlphabet('АаБбВвГгҐґДдЕеЄєЖжЗзИиІіЇїЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщьЮюЯя') --ASCII characters included automatically
