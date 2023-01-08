@@ -126,7 +126,7 @@ Edit field's value
 explorer.editFieldValue(explorer.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
 ```
 ### explorer.getLibStart()
-Get start address of libil2cpp.so. Returns 0 if [explorer.getLib()](#explorergetLib) wasn't called or library isn't loaded
+Get start address of libil2cpp.so. Returns 0 if [explorer.getLib](#explorergetLib) wasn't called or library isn't loaded
 ### explorer.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 Edit assembly of function. You should specify className to prevent finding functions with the same name. Target class must be loaded in memory to find offset (e. g. you are in menu, so you need to enter game at first place to modificate functions related to heal points ). If 1st parameter is nil, class name will be ignored (can boost search speed)  
 You can put nil in 3rd or 4th parameter if you don't want to specify information for some architecture.  
