@@ -456,6 +456,10 @@ end
 
 function explorer.readString(addr)
     -- Unity uses UTF-16LE
+    if (type(addr) ~= 'number') then
+        explorer.print('Wrong argument in explorer.readString: expected number, got ' .. type(addr))
+        return nil
+    end
     local len = explorer.readInt(addr + (isx64 and 0x10 or 0x8))
     if len > explorer.maxStringLength then
         return nil
