@@ -13,7 +13,7 @@ function init()
     local file = io.open(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua', 'r')
 
     if file == nil then
-        response = gg.makeRequest('https://github.com/explorer.heater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.lua')
+        response = gg.makeRequest('https://github.com/HTCheater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.lua')
         if response.code ~= 200 then
             print('Check internet connection')
             os.exit()
@@ -21,7 +21,7 @@ function init()
         file = io.open(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua', 'w')
         file:write(response.content)
     else
-        checksumResponse = gg.makeRequest('https://github.com/explorer.heater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.checksum')
+        checksumResponse = gg.makeRequest('https://github.com/HTCheater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.checksum')
         if checksumResponse.code ~= 200 then
             print('Check internet connection')
             os.exit()
@@ -57,7 +57,7 @@ function init()
     local file = io.open(gg.EXT_FILES_DIR .. '/Il2CppExplorer.lua', 'r')
 
     if file == nil then
-        response = gg.makeRequest('https://github.com/explorer.heater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.lua')
+        response = gg.makeRequest('https://github.com/HTCheater/Il2CppExplorer/releases/latest/download/Il2CppExplorer.lua')
         if response.code ~= 200 then
             print('Check internet connection')
             os.exit()
