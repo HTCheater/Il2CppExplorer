@@ -24,7 +24,7 @@ if explorer.printAdvert then
 end
 
 if (explorer.exitOnNotUnityGame and #gg.getRangesList("global-metadata.dat") < 1) then
-    print("❌Please, select Unity game")
+    print("🔴 Please, select Unity game")
     os.exit()
 end
 
@@ -115,7 +115,7 @@ function explorer.getInstances(classname)
 
     if gg.getResultsCount() < 1 then
         if debug then
-            print("Can't find " .. classname .. " in metadata")
+            print("🔴 Can't find " .. classname .. " in metadata")
         end
         local r = {}
         return r
@@ -144,7 +144,7 @@ function explorer.getInstances(classname)
     end
     if addr == 0 then
         if debug then
-            print("There is no valid pointer for " .. classname)
+            explorer.print("🔴 There is no valid pointer for " .. classname)
         end
         local r = {}
         return r
@@ -160,7 +160,7 @@ function explorer.getInstances(classname)
     gg.searchPointer(0)
     r = gg.getResults(100000)
     if gg.getResultsCount() == 0 and debug then
-        print("There are no instances for the " .. classname .. ", try to load the class first")
+        explorer.print("🔴 There are no instances for the " .. classname .. ", try to load the class first")
     end
     gg.clearResults()
     return r
@@ -182,7 +182,7 @@ function explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
         offset = offsetX32
     end
     if (patchedBytes == nil or offset == nil) then
-        explorer.print("❌There is no valid patch for current architecture")
+        explorer.print("🔴 There is no valid patch for current architecture")
         return
     end
     local currAddress = explorer.libStart + offset
@@ -255,7 +255,7 @@ function explorer.getLib()
         end
     end
     if explorer.libStart == 0x0 then
-        explorer.print("Failed to get libil2cpp.so address, try entering the game first")
+        explorer.print("🔴 Failed to get libil2cpp.so address, try entering the game first")
     end
 end
 
@@ -263,19 +263,19 @@ end
 
 function explorer.getField(instancesTable, offset, offsetX32, type, index)
     if instancesTable == nil then
-        explorer.print("❌Instances table is nil")
+        explorer.print("🔴 Instances table is nil")
         return nil
     end
     local instance = instancesTable[index]
     if instance == nil then
-        explorer.print("❌Wrong index (no results found?)")
+        explorer.print("🔴 Wrong index (no results found?)")
         return nil
     end
     if not isx64 then
         offset = offsetX32
     end
     if offset == nil then
-        explorer.print("❌Offset for this architecture is not specified")
+        explorer.print("🔴 Offset for this architecture is not specified")
         return nil
     end
     return explorer.readValue(instance.address + offset, type)
@@ -285,19 +285,19 @@ end
 
 function explorer.editField(instancesTable, offset, offsetX32, type, index, value)
     if instancesTable == nil then
-        explorer.print("❌Instances table is nil")
+        explorer.print("🔴 Instances table is nil")
         return nil
     end
     local instance = instancesTable[index]
     if instance == nil then
-        explorer.print("❌Wrong index (no results found?)")
+        explorer.print("🔴 Wrong index (no results found?)")
         return nil
     end
     if not isx64 then
         offset = offsetX32
     end
     if offset == nil then
-        explorer.print("❌Offset for this architecture is not specified")
+        explorer.print("🔴 Offset for this architecture is not specified")
         return nil
     end
 
@@ -354,7 +354,7 @@ function explorer.getFunction(className, functionName)
     end
 
     if addr == 0 then
-        explorer.print("There is no valid pointer for " .. className)
+        explorer.print("🔴 There is no valid pointer for " .. className)
         return
     end
 
@@ -364,7 +364,7 @@ function explorer.getFunction(className, functionName)
 
     addr = addr - explorer.libStart
 
-    explorer.print("Offset for " .. functionName .. ": " .. string.format('%X', addr))
+    explorer.print("🟢 Offset for " .. functionName .. ": " .. string.format('%X', addr))
 
     return addr
 end
@@ -457,7 +457,7 @@ end
 function explorer.readString(addr)
     -- Unity uses UTF-16LE
     if (type(addr) ~= 'number') then
-        explorer.print('Wrong argument in explorer.readString: expected number, got ' .. type(addr))
+        explorer.print('🔴 Wrong argument in explorer.readString: expected number, got ' .. type(addr))
         return nil
     end
     local len = explorer.readInt(addr + (isx64 and 0x10 or 0x8))
@@ -473,7 +473,7 @@ function explorer.readString(addr)
             if (alphabet[c] ~= nil) then
                 str = str .. alphabet[c]
             else
-                explorer.print('Warn: unrecognised character ' .. c .. '. Consider adding it to alphabet')
+                explorer.print('🟡 Warn: unrecognised character ' .. c .. '. Consider adding it to the alphabet')
             end
         end
     end
@@ -482,11 +482,11 @@ end
 
 function explorer.setAlphabet(str)
     if (str == nil or not (type(str) == 'string')) then
-        explorer.print('Wrong argument in explorer.setAlphabet: expected string, got ' .. type(str))
+        explorer.print('🔴 Wrong argument in explorer.setAlphabet: expected string, got ' .. type(str))
         return
     end
     alphabet = {}
-    str:gsub(".", function(c)
+    str:gsub("[%z\1-\127\194-\244][\128-\191]*", function(c)
         local bytes = gg.bytes(c, 'UTF-16LE')
         local utf8Chars = ''
         for k, v in pairs(bytes) do
