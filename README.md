@@ -155,7 +155,7 @@ print('get_hp offset: ' .. string.format('%X', off))
 ```
 
 ### explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
-CONSIDER USING [explorer.editFunction](#explorer.editFunction)!  
+CONSIDER USING [explorer.editFunction](#explorereditfunctionclassname-functionname-patchedbytes-patchedbytesx32)!  
 Edit assembly in libil2cpp.so.  
 Put nil if you don't want to specify information for some architecture.  
 patchedBytes is a table that can contain either numbers or strings with opcodes or hex (must start with h)  
@@ -170,10 +170,10 @@ explorer.patchLib(0x19CFDA, 0x9DFCA, {'RET'}, {'h1EFF2FE1'})
 explorer.patchLib(0x19CFDA, nil, {-698416192})
 ```
 ### explorer.getLib()
-Run if you need [explorer.libStart](#explorer.libStart) before you called either explorer.editFunction or explorer.patchLib
+Run if you need [explorer.libStart](#explorerlibstart) before you called either explorer.editFunction or explorer.patchLib
 
 ### explorer.readString(addr)
-Read string at desired address. If string length is too large, returns nil. You can modify maximum length in [explorer.maxStringLength](#explorer.maxStringLength) field. If you want to read non-ASCII characters, you should check out [explorer.setAlphabet](#explorer.setAlphabet) 
+Read string at desired address. If string length is too large, returns nil. You can modify maximum length in [explorer.maxStringLength](#explorermaxStringLength) field. If you want to read non-ASCII characters, you should check out [explorer.setAlphabet](#explorersetalphabetstr) 
 **Parameters:**  
 1st parameter is a pointer to String instance  
 **Example:**  
