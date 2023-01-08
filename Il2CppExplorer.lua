@@ -15,7 +15,7 @@ if (explorer.exitOnNotUnityGame == nil) then
     explorer.exitOnNotUnityGame = true
 end
 -- Contains start address of libil2cpp.so once either explorer.getLib or explorer.patchLib or explorer.editFunction was called
-explorer.libStart = 0x0
+local libStart = 0x0
 explorer.maxStringLength = 1000
 local alphabet = {}
 
@@ -173,7 +173,7 @@ end
 
 function explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
     gg.clearResults()
-    if explorer.libStart == 0 then
+    if libStart == 0 then
         explorer.getLib()
     end
     local patch = {}
@@ -185,7 +185,7 @@ function explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
         explorer.print("🔴 There is no valid patch for current architecture")
         return
     end
-    local currAddress = explorer.libStart + offset
+    local currAddress = libStart + offset
     for k, v in ipairs(patchedBytes) do
         local t = {}
         t[1] = {}
@@ -208,13 +208,17 @@ function explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
     end
 end
 
--- Call explorer.getLib in case you need access to explorer.libStart
+function getLibStart()
+    return libStart
+end
+
+-- Call explorer.getLib in case you need access to libStart
 
 function explorer.getLib()
     explorer.setAllRanges()
     local libil2cpp
     if gg.getRangesList("libil2cpp.so")[1] ~= nil then
-        explorer.libStart = gg.getRangesList("libil2cpp.so")[1].start
+        libStart = gg.getRangesList("libil2cpp.so")[1].start
         return
     end
 
@@ -246,7 +250,7 @@ function explorer.getLib()
                     gg.loadResults(t)
                     local pointers = gg.getResults(1, 0, nil, nil, nil, nil, nil, nil, gg.POINTER_EXECUTABLE)
                     if #pointers ~= 0 then
-                        explorer.libStart = explorer.readPointer(t[1].address)
+                        libStart = explorer.readPointer(t[1].address)
                         break
                     end
                 end
@@ -254,7 +258,7 @@ function explorer.getLib()
             break
         end
     end
-    if explorer.libStart == 0x0 then
+    if libStart == 0x0 then
         explorer.print("🔴 Failed to get libil2cpp.so address, try entering the game first")
     end
 end
@@ -358,11 +362,11 @@ function explorer.getFunction(className, functionName)
         return
     end
 
-    if explorer.libStart == 0 then
+    if libStart == 0 then
         explorer.getLib()
     end
 
-    addr = addr - explorer.libStart
+    addr = addr - libStart
 
     explorer.print("🟢 Offset for " .. functionName .. ": " .. string.format('%X', addr))
 
