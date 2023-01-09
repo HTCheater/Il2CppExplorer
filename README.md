@@ -110,7 +110,7 @@ Get field's value
 5th parameter is desired index  
 **Example:**
 ```lua
-explorer.getFieldValue(explorer.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1)
+explorer.getField(explorer.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1)
 ```
 ### explorer.editField(instancesTable, offset, offsetX32, type, index, value)
 Edit field's value  
@@ -123,7 +123,7 @@ Edit field's value
 6th parameter is value to set  
 **Example:**
 ```lua
-explorer.editFieldValue(explorer.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
+explorer.editField(explorer.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
 ```
 ### explorer.getLibStart()
 Get start address of libil2cpp.so. Returns 0 if [explorer.getLib](#explorergetLib) wasn't called or library isn't loaded
