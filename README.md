@@ -78,10 +78,10 @@ init()
 
 ## Fields
 ### explorer.debug
-Control debug messages output, recommended to set value to true if you are developing script.  
+Control debug messages output, recommended to set value to true if you make script.  
 Default value is false
 ### explorer.printAdvert
-Let user know what are you using :D. You need to set value before running the framework. You need to set value before running framework  
+Let user know what are you using :D. You need to set value before running the framework.  
 Default value is true
 ### explorer.exitOnNotUnityGame
 Exit if selected process isn't a Unity game, **it isn't recommended to change**. You need to set value before running framework  
