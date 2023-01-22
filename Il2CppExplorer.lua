@@ -208,7 +208,7 @@ function explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
     end
 end
 
-function getLibStart()
+function explorer.getLibStart()
     return libStart
 end
 
