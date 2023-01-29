@@ -272,13 +272,17 @@ end
 
 -- Get field value in instance from instances table specified by index
 
-function explorer.getField(instance, offset, offsetX32, type)
+function explorer.getField(instance, offset, offsetX32, valueType)
     if type(instance) ~= 'table' then
         explorer.print("🔴 explorer.getField: expected table for parameter instance, got " .. type(instance))
         return nil
     end
     if type(instance.address) ~= 'number' then
         explorer.print("🔴 explorer.getField: expected number for instance.address, got " .. type(instance.address))
+        return nil
+    end
+    if type(valueType) ~= 'number' then
+        explorer.print("🔴 explorer.getField: expected number for valueType, got " .. type(valueType))
         return nil
     end
     if not isx64 then
@@ -293,7 +297,7 @@ end
 
 -- Edit field value in instance from instances table specified by index
 
-function explorer.editField(instance, offset, offsetX32, type, value)
+function explorer.editField(instance, offset, offsetX32, valueType, value)
     if type(instance) ~= 'table' then
         explorer.print("🔴 explorer.editField: expected table for parameter instance, got " .. type(instance))
         return
@@ -302,8 +306,8 @@ function explorer.editField(instance, offset, offsetX32, type, value)
         explorer.print("🔴 explorer.editField: expected number for instance.address, got " .. type(instance.address))
         return
     end
-    if type(type) ~= 'number' then
-        explorer.print("🔴 explorer.editField: expected number for parameter type, got " .. type(type))
+    if type(valueType) ~= 'number' then
+        explorer.print("🔴 explorer.editField: expected number for parameter valueType, got " .. type(valueType))
         return
     end
     if type(value) ~= 'number' then
@@ -459,15 +463,15 @@ function explorer.isFunctionPointer(address, className)
     return true
 end
 
-function explorer.readValue(addr, type)
+function explorer.readValue(addr, valueType)
     if type(addr) ~= 'number' then
         explorer.print("🔴 explorer.readValue: expected number for parameter addr, got " .. type(addr))
-        return 0
+        return
     end
 
-    if type(type) ~= 'number' then
-        explorer.print("🔴 explorer.readValue: expected number for parameter type, got " .. type(type))
-        return 0
+    if type(valueType) ~= 'number' then
+        explorer.print("🔴 explorer.readValue: expected number for parameter valueType, got " .. type(valueType))
+        return
     end
     local t = {}
     t[1] = {}
