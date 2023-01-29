@@ -292,7 +292,7 @@ function explorer.getField(instance, offset, offsetX32, valueType)
         explorer.print("🔴 explorer.getField: offset for this architecture is not specified")
         return nil
     end
-    return explorer.readValue(instance.address + offset, type)
+    return explorer.readValue(instance.address + offset, valueType)
 end
 
 -- Edit field value in instance from instances table specified by index
@@ -325,7 +325,7 @@ function explorer.editField(instance, offset, offsetX32, valueType, value)
     local t = {}
     t[1] = {}
     t[1].address = instance.address + offset
-    t[1].flags = type
+    t[1].flags = valueType
     t[1].value = value
     gg.setValues(t)
 end
@@ -476,7 +476,7 @@ function explorer.readValue(addr, valueType)
     local t = {}
     t[1] = {}
     t[1].address = addr
-    t[1].flags = type
+    t[1].flags = valueType
 
     t = gg.getValues(t)
 
