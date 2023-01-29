@@ -265,14 +265,9 @@ end
 
 -- Get field value in instance from instances table specified by index
 
-function explorer.getField(instancesTable, offset, offsetX32, type, index)
-    if instancesTable == nil then
-        explorer.print("🔴 Instances table is nil")
-        return nil
-    end
-    local instance = instancesTable[index]
+function explorer.getField(instance, offset, offsetX32, type)
     if instance == nil then
-        explorer.print("🔴 Wrong index (no results found?)")
+        explorer.print("🔴 Instance is nil")
         return nil
     end
     if not isx64 then
@@ -358,7 +353,8 @@ function explorer.getFunction(className, functionName)
     end
 
     if addr == 0 then
-        explorer.print("🔴 There is no valid pointer for " .. className)
+        explorer.print("🔴 There is no valid pointer for " .. functionName ..
+                           ((className == nil) and "" or (" in " .. className)))
         return
     end
 
@@ -377,6 +373,9 @@ end
 -- className should be specified to prevent finding wrong functions with the same name
 function explorer.editFunction(className, functionName, patchedBytes, patchedBytesX32)
     local offs = explorer.getFunction(className, functionName)
+    if (offs == nil) then
+        return
+    end
     explorer.patchLib(offs, offs, patchedBytes, patchedBytesX32)
 end
 
