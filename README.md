@@ -100,7 +100,7 @@ Returns a table with search results
 ```lua
 explorer.getInstances('RGHand')
 ```
-### explorer.getField(instancesTable, offset, offsetX32, type, index)
+### explorer.getField(instance, offset, offsetX32, type)
 Get field's value  
 **Parameters:**  
 1st parameter is return value of explorer.getInstances  
@@ -110,9 +110,9 @@ Get field's value
 5th parameter is desired index  
 **Example:**
 ```lua
-explorer.getField(explorer.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1)
+explorer.getField(explorer.getInstances('RGHand')[1], 0x10, 0x8, gg.TYPE_DWORD)
 ```
-### explorer.editField(instancesTable, offset, offsetX32, type, index, value)
+### explorer.editField(instance, offset, offsetX32, type, value)
 Edit field's value  
 **Parameters:**  
 1st parameter is return value of explorer.getInstances  
@@ -123,7 +123,7 @@ Edit field's value
 6th parameter is value to set  
 **Example:**
 ```lua
-explorer.editField(explorer.getInstances('RGHand'), 0x10, 0x8, gg.TYPE_DWORD, 1, 99999)
+explorer.editField(explorer.getInstances('RGHand')[1], 0x10, 0x8, gg.TYPE_DWORD, 99999)
 ```
 ### explorer.getLibStart()
 Get start address of libil2cpp.so. Returns 0 if [explorer.getLib](#explorergetLib) wasn't called or library isn't loaded
