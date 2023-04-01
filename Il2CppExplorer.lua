@@ -20,49 +20,49 @@ explorer.maxStringLength = 1000
 local alphabet = {}
 
 if explorer.printAdvert then
-	print("✨ Made with Il2CppExplorer by HTCheater")
+	print('✨ Made with Il2CppExplorer by HTCheater')
 end
 
-if (explorer.exitOnNotUnityGame and #gg.getRangesList("global-metadata.dat") < 1) then
-	print("🔴 Please, select Unity game")
+if (explorer.exitOnNotUnityGame and #gg.getRangesList('global-metadata.dat') < 1) then
+	print('🔴 Please, select Unity game')
 	os.exit()
 end
 
 -- String utils, feel free to use in your own script.
 
 string.startsWith = function(self, str)
-	return self:find("^" .. str) ~= nil
+	return self:find('^' .. str) ~= nil
 end
 
 string.endsWith = function(str, ending)
-	return ending == "" or str:sub(-(#ending)) == ending
+	return ending == '' or str:sub(-(#ending)) == ending
 end
 
 string.toUpper = function(str)
-	res, c = str:gsub("^%l", string.upper)
+	res, c = str:gsub('^%l', string.upper)
 	return res
 end
 
 string.removeEnd = function(str, rem)
-	return (str:gsub("^(.-)" .. rem .. "$", "%1"))
+	return (str:gsub('^(.-)' .. rem .. '$', '%1'))
 end
 
 string.removeStart = function(str, rem)
-	return (str:gsub("^" .. rem .. "(.-)$", "%1"))
+	return (str:gsub('^' .. rem .. '(.-)$', '%1'))
 end
 
 -- some functions
 local isx64 = gg.getTargetInfo().x64
-local metadata = gg.getRangesList("global-metadata.dat")
+local metadata = gg.getRangesList('global-metadata.dat')
 
 if #metadata > 0 then
 	metadata = metadata[1]
 end
 
 function explorer.setAllRanges()
-	gg.setRanges(gg.REGION_JAVA_HEAP | gg.REGION_C_HEAP | gg.REGION_C_ALLOC | gg.REGION_C_DATA | gg.REGION_C_BSS |
-					 gg.REGION_PPSSPP | gg.REGION_ANONYMOUS | gg.REGION_JAVA | gg.REGION_STACK | gg.REGION_ASHMEM |
-					 gg.REGION_VIDEO | gg.REGION_OTHER | gg.REGION_BAD | gg.REGION_CODE_APP | gg.REGION_CODE_SYS)
+	gg.setRanges(gg.REGION_JAVA_HEAP | gg.REGION_C_HEAP | gg.REGION_C_ALLOC | gg.REGION_C_DATA | gg.REGION_C_BSS | gg.REGION_PPSSPP |
+					             gg.REGION_ANONYMOUS | gg.REGION_JAVA | gg.REGION_STACK | gg.REGION_ASHMEM | gg.REGION_VIDEO | gg.REGION_OTHER |
+					             gg.REGION_BAD | gg.REGION_CODE_APP | gg.REGION_CODE_SYS)
 end
 
 -- Check wether the metadata class name pointer is suitable to find instances. Returns boolean.
@@ -104,23 +104,23 @@ end
 
 function explorer.getInstances(classname)
 	if type(classname) ~= 'string' then
-		explorer.print("🔴 explorer.getInstances: expected string for parameter classname, got " .. type(classname))
+		explorer.print('🔴 explorer.getInstances: expected string for parameter classname, got ' .. type(classname))
 		return {}
 	end
 	explorer.setAllRanges()
 	gg.clearResults()
-	local stringBytes = gg.bytes(classname, "UTF-8")
-	local searchStr = "0"
+	local stringBytes = gg.bytes(classname, 'UTF-8')
+	local searchStr = '0'
 	for k, v in ipairs(stringBytes) do
-		searchStr = searchStr .. "; " .. v
+		searchStr = searchStr .. '; ' .. v
 	end
-	searchStr = searchStr .. "; 0::" .. (2 + #stringBytes)
+	searchStr = searchStr .. '; 0::' .. (2 + #stringBytes)
 
-	gg.searchNumber(searchStr, gg.TYPE_BYTE, false, gg.SIGN_EQUAL, metadata.start, metadata["end"], 2)
+	gg.searchNumber(searchStr, gg.TYPE_BYTE, false, gg.SIGN_EQUAL, metadata.start, metadata['end'], 2)
 
 	if gg.getResultsCount() < 1 then
 		if debug then
-			print("🔴 explorer.getInstances: can't find " .. classname .. " in metadata")
+			print('🔴 explorer.getInstances: can\'t find ' .. classname .. ' in metadata')
 		end
 		local r = {}
 		return r
@@ -129,10 +129,10 @@ function explorer.getInstances(classname)
 	r[1] = gg.getResults(2)[2]
 
 	local addr = 0x0
-	for k, v in pairs(gg.getRangesList("libc_malloc")) do
+	for k, v in pairs(gg.getRangesList('libc_malloc')) do
 		gg.clearResults()
-		gg.searchNumber(string.format("%X", r[1].address) .. "h", isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD, false,
-			gg.SIGN_EQUAL, v.start, v["end"], 0)
+		gg.searchNumber(string.format('%X', r[1].address) .. 'h', isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD, false, gg.SIGN_EQUAL,
+		                v.start, v['end'], 0)
 
 		local results = gg.getResults(100)
 		gg.clearResults()
@@ -149,7 +149,7 @@ function explorer.getInstances(classname)
 	end
 	if addr == 0 then
 		if debug then
-			explorer.print("🔴 explorer.getInstances: there is no valid pointer for " .. classname)
+			explorer.print('🔴 explorer.getInstances: there is no valid pointer for ' .. classname)
 		end
 		local r = {}
 		return r
@@ -165,8 +165,7 @@ function explorer.getInstances(classname)
 	gg.searchPointer(0)
 	r = gg.getResults(100000)
 	if gg.getResultsCount() == 0 and debug then
-		explorer.print("🔴 explorer.getInstances: there are no instances for the " .. classname ..
-						   ", try to load the class first")
+		explorer.print('🔴 explorer.getInstances: there are no instances for the ' .. classname .. ', try to load the class first')
 	end
 	gg.clearResults()
 	return r
@@ -189,7 +188,7 @@ function explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
 		offset = offsetX32
 	end
 	if (patchedBytes == nil or offset == nil) then
-		explorer.print("🔴 explorer.patchLib: there is no valid patch for current architecture")
+		explorer.print('🔴 explorer.patchLib: there is no valid patch for current architecture')
 		return
 	end
 	local currAddress = libStart + offset
@@ -198,16 +197,16 @@ function explorer.patchLib(offset, offsetX32, patchedBytes, patchedBytesX32)
 		t[1] = {}
 		t[1].address = currAddress
 		t[1].flags = gg.TYPE_DWORD
-		if type(v) == "number" then
+		if type(v) == 'number' then
 			t[1].value = v
 			gg.setValues(t)
 		end
-		if type(v) == "string" then
-			if v:startsWith("h") then
+		if type(v) == 'string' then
+			if v:startsWith('h') then
 				t[1].value = v
 				gg.setValues(t)
 			else
-				t[1].value = (isx64 and "~A8 " or "~A ") .. v
+				t[1].value = (isx64 and '~A8 ' or '~A ') .. v
 				gg.setValues(t)
 			end
 		end
@@ -224,16 +223,16 @@ end
 function explorer.getLib()
 	explorer.setAllRanges()
 	local libil2cpp
-	if gg.getRangesList("libil2cpp.so")[1] ~= nil then
-		libStart = gg.getRangesList("libil2cpp.so")[1].start
+	if gg.getRangesList('libil2cpp.so')[1] ~= nil then
+		libStart = gg.getRangesList('libil2cpp.so')[1].start
 		return
 	end
 
-	local ranges = gg.getRangesList("bionic_alloc_small_objects")
+	local ranges = gg.getRangesList('bionic_alloc_small_objects')
 	for i, range in pairs(ranges) do
-		gg.searchNumber("47;108;105;98;105;108;50;99;112;112;46;115;111;0::14", gg.TYPE_BYTE, false, gg.SIGN_EQUAL,
-			range['start'], range['end'], 1)
-		gg.refineNumber("47", gg.TYPE_BYTE)
+		gg.searchNumber('47;108;105;98;105;108;50;99;112;112;46;115;111;0::14', gg.TYPE_BYTE, false, gg.SIGN_EQUAL, range['start'],
+		                range['end'], 1)
+		gg.refineNumber('47', gg.TYPE_BYTE)
 		if gg.getResultsCount() ~= 0 then
 			local str = gg.getResults(1)[1]
 			gg.clearResults()
@@ -245,7 +244,7 @@ function explorer.getLib()
 			t[1] = {}
 			t[1].address = addr + 1
 			t[1].flags = gg.TYPE_BYTE
-			for k, v in pairs(gg.getRangesList("linker_alloc")) do
+			for k, v in pairs(gg.getRangesList('linker_alloc')) do
 				gg.clearResults()
 				gg.loadResults(t)
 				gg.searchPointer(0, v['start'], v['end'])
@@ -266,7 +265,7 @@ function explorer.getLib()
 		end
 	end
 	if libStart == 0x0 then
-		explorer.print("🔴 explorer.getLib: failed to get libil2cpp.so address, try entering the game first")
+		explorer.print('🔴 explorer.getLib: failed to get libil2cpp.so address, try entering the game first')
 	end
 end
 
@@ -274,22 +273,22 @@ end
 
 function explorer.getField(instance, offset, offsetX32, valueType)
 	if type(instance) ~= 'table' then
-		explorer.print("🔴 explorer.getField: expected table for parameter instance, got " .. type(instance))
+		explorer.print('🔴 explorer.getField: expected table for parameter instance, got ' .. type(instance))
 		return nil
 	end
 	if type(instance.address) ~= 'number' then
-		explorer.print("🔴 explorer.getField: expected number for instance.address, got " .. type(instance.address))
+		explorer.print('🔴 explorer.getField: expected number for instance.address, got ' .. type(instance.address))
 		return nil
 	end
 	if type(valueType) ~= 'number' then
-		explorer.print("🔴 explorer.getField: expected number for valueType, got " .. type(valueType))
+		explorer.print('🔴 explorer.getField: expected number for valueType, got ' .. type(valueType))
 		return nil
 	end
 	if not isx64 then
 		offset = offsetX32
 	end
 	if offset == nil then
-		explorer.print("🔴 explorer.getField: offset for this architecture is not specified")
+		explorer.print('🔴 explorer.getField: offset for this architecture is not specified')
 		return nil
 	end
 	return explorer.readValue(instance.address + offset, valueType)
@@ -299,26 +298,26 @@ end
 
 function explorer.editField(instance, offset, offsetX32, valueType, value)
 	if type(instance) ~= 'table' then
-		explorer.print("🔴 explorer.editField: expected table for parameter instance, got " .. type(instance))
+		explorer.print('🔴 explorer.editField: expected table for parameter instance, got ' .. type(instance))
 		return
 	end
 	if type(instance.address) ~= 'number' then
-		explorer.print("🔴 explorer.editField: expected number for instance.address, got " .. type(instance.address))
+		explorer.print('🔴 explorer.editField: expected number for instance.address, got ' .. type(instance.address))
 		return
 	end
 	if type(valueType) ~= 'number' then
-		explorer.print("🔴 explorer.editField: expected number for parameter valueType, got " .. type(valueType))
+		explorer.print('🔴 explorer.editField: expected number for parameter valueType, got ' .. type(valueType))
 		return
 	end
 	if type(value) ~= 'number' then
-		explorer.print("🔴 explorer.editField: expected number for parameter value, got " .. type(value))
+		explorer.print('🔴 explorer.editField: expected number for parameter value, got ' .. type(value))
 		return
 	end
 	if not isx64 then
 		offset = offsetX32
 	end
 	if offset == nil then
-		explorer.print("🔴 explorer.editField: offset for this architecture is not specified")
+		explorer.print('🔴 explorer.editField: offset for this architecture is not specified')
 		return
 	end
 
@@ -332,30 +331,28 @@ end
 
 function explorer.getFunction(className, functionName)
 	if type(functionName) ~= 'string' then
-		explorer.print("🔴 explorer.getFunction: expected string for parameter functionName, got " ..
-						   type(functionName))
+		explorer.print('🔴 explorer.getFunction: expected string for parameter functionName, got ' .. type(functionName))
 		return nil
 	end
 	if ((type(className) ~= 'nil') and (type(className) ~= 'string')) then
-		explorer.print("🔴 explorer.getFunction: expected string for parameter className, got " .. type(className))
+		explorer.print('🔴 explorer.getFunction: expected string for parameter className, got ' .. type(className))
 		return nil
 	end
 	explorer.setAllRanges()
 	gg.clearResults()
-	local stringBytes = gg.bytes(functionName, "UTF-8")
-	local searchStr = "0"
+	local stringBytes = gg.bytes(functionName, 'UTF-8')
+	local searchStr = '0'
 	for k, v in ipairs(stringBytes) do
-		searchStr = searchStr .. "; " .. v
+		searchStr = searchStr .. '; ' .. v
 	end
-	searchStr = searchStr .. "; 0::" .. (2 + #stringBytes)
+	searchStr = searchStr .. '; 0::' .. (2 + #stringBytes)
 
-	gg.searchNumber(searchStr, gg.TYPE_BYTE, false, gg.SIGN_EQUAL, metadata.start, metadata["end"],
-		(className == nil) and 2 or nil)
-	gg.refineNumber("0; " .. stringBytes[1], gg.TYPE_BYTE)
+	gg.searchNumber(searchStr, gg.TYPE_BYTE, false, gg.SIGN_EQUAL, metadata.start, metadata['end'], (className == nil) and 2 or nil)
+	gg.refineNumber('0; ' .. stringBytes[1], gg.TYPE_BYTE)
 	gg.refineNumber(stringBytes[1], gg.TYPE_BYTE)
 
 	if gg.getResultsCount() == 0 then
-		explorer.print("Can't find " .. functionName .. " in metadata")
+		explorer.print('Can\'t find ' .. functionName .. ' in metadata')
 		local r = {}
 		return r
 	end
@@ -363,10 +360,10 @@ function explorer.getFunction(className, functionName)
 	local addr = 0x0
 
 	for index, result in pairs(gg.getResults(100000)) do
-		for k, v in pairs(gg.getRangesList("libc_malloc")) do
+		for k, v in pairs(gg.getRangesList('libc_malloc')) do
 			gg.clearResults()
-			gg.searchNumber(string.format("%X", result.address) .. "h", isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD, false,
-				gg.SIGN_EQUAL, v.start, v["end"], 0)
+			gg.searchNumber(string.format('%X', result.address) .. 'h', isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD, false, gg.SIGN_EQUAL,
+			                v.start, v['end'], 0)
 
 			local results = gg.getResults(100)
 			gg.clearResults()
@@ -384,8 +381,8 @@ function explorer.getFunction(className, functionName)
 	end
 
 	if addr == 0 then
-		explorer.print("🔴 explorer.getFunction: there is no valid pointer for " .. functionName ..
-						   ((className == nil) and "" or (" in " .. className)))
+		explorer.print('🔴 explorer.getFunction: there is no valid pointer for ' .. functionName ..
+						               ((className == nil) and '' or (' in ' .. className)))
 		return nil
 	end
 
@@ -395,7 +392,7 @@ function explorer.getFunction(className, functionName)
 
 	addr = addr - libStart
 
-	explorer.print("🟢 explorer.getFunction: offset for " .. functionName .. ": " .. string.format('%X', addr))
+	explorer.print('🟢 explorer.getFunction: offset for ' .. functionName .. ': ' .. string.format('%X', addr))
 
 	return addr
 end
@@ -404,13 +401,11 @@ end
 -- className should be specified to prevent finding wrong functions with the same name
 function explorer.editFunction(className, functionName, patchedBytes, patchedBytesX32)
 	if ((type(className) ~= 'nil') and (type(className) ~= 'string')) then
-		explorer.print("🔴 explorer.editFunction: expected string or nil for parameter className, got " ..
-						   type(className))
+		explorer.print('🔴 explorer.editFunction: expected string or nil for parameter className, got ' .. type(className))
 		return
 	end
 	if type(functionName) ~= 'string' then
-		explorer.print("🔴 explorer.editFunction: expected string for parameter functionName, got " ..
-						   type(functionName))
+		explorer.print('🔴 explorer.editFunction: expected string for parameter functionName, got ' .. type(functionName))
 		return
 	end
 	local offs = explorer.getFunction(className, functionName)
@@ -450,9 +445,8 @@ function explorer.isFunctionPointer(address, className)
 		return false
 	end
 	if className ~= nil then
-		currAddr =
-			explorer.readPointer(explorer.readPointer(address + (isx64 and 0x8 or 0x4)) + (isx64 and 0x10 or 0x8))
-		classBytes = gg.bytes(className, "UTF-8")
+		currAddr = explorer.readPointer(explorer.readPointer(address + (isx64 and 0x8 or 0x4)) + (isx64 and 0x10 or 0x8))
+		classBytes = gg.bytes(className, 'UTF-8')
 		for k, v in pairs(classBytes) do
 			if (v ~= explorer.readByte(currAddr)) then
 				return false
@@ -465,12 +459,12 @@ end
 
 function explorer.readValue(addr, valueType)
 	if type(addr) ~= 'number' then
-		explorer.print("🔴 explorer.readValue: expected number for parameter addr, got " .. type(addr))
+		explorer.print('🔴 explorer.readValue: expected number for parameter addr, got ' .. type(addr))
 		return
 	end
 
 	if type(valueType) ~= 'number' then
-		explorer.print("🔴 explorer.readValue: expected number for parameter valueType, got " .. type(valueType))
+		explorer.print('🔴 explorer.readValue: expected number for parameter valueType, got ' .. type(valueType))
 		return
 	end
 	local t = {}
@@ -510,15 +504,14 @@ end
 function explorer.readString(addr)
 	-- Unity uses UTF-16LE
 	if type(addr) ~= 'number' then
-		explorer.print('🔴 explorer.readString: wrong argument in explorer.readString: expected number, got ' ..
-						   type(addr))
-		return ""
+		explorer.print('🔴 explorer.readString: wrong argument in explorer.readString: expected number, got ' .. type(addr))
+		return ''
 	end
 	local len = explorer.readInt(addr + (isx64 and 0x10 or 0x8))
 	if len > explorer.maxStringLength then
-		return ""
+		return ''
 	end
-	local str = ""
+	local str = ''
 	for i = 1, len, 1 do
 		local c = explorer.readShort(addr + (isx64 and 0x14 or 0xC) + (2 * (i - 1)))
 		if (c > -1 and c < 129) then
@@ -527,8 +520,7 @@ function explorer.readString(addr)
 			if (alphabet[c] ~= nil) then
 				str = str .. alphabet[c]
 			else
-				explorer.print('🟡 explorer.readString: unrecognised character ' .. c ..
-								   '. Consider adding it to the alphabet')
+				explorer.print('🟡 explorer.readString: unrecognised character ' .. c .. '. Consider adding it to the alphabet')
 			end
 		end
 	end
@@ -537,114 +529,110 @@ end
 
 function explorer.setAlphabet(str)
 	if type(str) ~= 'string' then
-		explorer.print('🔴 explorer.setAlphabet: wrong argument in explorer.setAlphabet: expected string, got ' ..
-						   type(str))
+		explorer.print('🔴 explorer.setAlphabet: wrong argument in explorer.setAlphabet: expected string, got ' .. type(str))
 		return
 	end
 	alphabet = {}
-	str:gsub("[%z\1-\127\194-\244][\128-\191]*", function(c)
+	str:gsub('[%z\1-\127\194-\244][\128-\191]*', function(c)
 		local bytes = gg.bytes(c, 'UTF-16LE')
 		local utf8Chars = ''
 		for k, v in pairs(bytes) do
 			utf8Chars = utf8Chars .. string.char(v)
 		end
-		local short = string.unpack("<i2", utf8Chars)
+		local short = string.unpack('<i2', utf8Chars)
 		alphabet[short] = c
 	end)
 end
 
+memory = {}
+local currentAddr = nil
+local freeSpace = nil
+local pages = {}
+local pageIndex = 0
 
-memory = {
-	local currentAddr = nil
-	local freeSpace = nil
-	local pages = {}
-	local pageIndex = 0;
+-- in case someone needs access to this fields
 
-	--in case someone needs access to this fields
+function memory.getCurrentAddress()
+	return currAddr
+end
 
-	function getCurrentAddress()
-		return currAddr
-	end
+function memory.getFreeSpace()
+	return freeSpace
+end
 
-	function getFreeSpace()
-		return freeSpace
-	end
+function memory.getPages()
+	return pages
+end
 
-	function getPages()
-		return pages
-	end
-
-
-
-	function alloc()
-		if (pageIndex < #pages) then
-			pageIndex = pageIndex + 1
-			freeSpace = 4096
-			currentAddr = pages[pageIndex]
-			explorer.print('🟢 memory.alloc: reused page ' .. string.format('%X', currentAddr))
-			return pages[pageIndex]
-		end
-		local ptr = gg.allocatePage(gg.PROT_READ | gg.PROT_WRITE | gg.PROT_EXEC)
-		currentAddr = ptr
-		freeSpace = 4096
+function memory.alloc()
+	if (pageIndex < #pages) then
 		pageIndex = pageIndex + 1
-		pages[pageIndex] = ptr
-		explorer.print('🟢 memory.alloc: allocated page ' .. string.format('%X', currentAddr))
-		return ptr
+		freeSpace = 4096
+		currentAddr = pages[pageIndex]
+		explorer.print('🟢 memory.alloc: reused page ' .. string.format('%X', currentAddr))
+		return pages[pageIndex]
+	end
+	local ptr = gg.allocatePage(gg.PROT_READ | gg.PROT_WRITE | gg.PROT_EXEC)
+	currentAddr = ptr
+	freeSpace = 4096
+	pageIndex = pageIndex + 1
+	pages[pageIndex] = ptr
+	explorer.print('🟢 memory.alloc: allocated page ' .. string.format('%X', currentAddr))
+	return ptr
+end
+
+function memory.write(t)
+	if type(t) ~= 'table' then
+		explorer.print('🔴 memory.write: expected table for first parameter, got ' .. type(t))
+		return false
+	end
+	if #t > 4096 then
+		explorer.print('🔴 memory.write: table size cannot be over 4096, table size ' .. #t)
+		return false
 	end
 
-	function write(t)
-		if type(t) ~= 'table' then
-			explorer.print('🔴 memory.write: expected table for first parameter, got ' ..  type(t))
-			return false
+	local spaceNeeded = 0
+	for k, v in pairs(t) do
+		if (v.flags == nil) then
+			v.flags = TYPE_DWORD
 		end
-		if #t > 4096 then
-			explorer.print('🔴 memory.write: table size cannot be over 4096, table size ' .. #t)
-			return false
-		end
-		
-		local spaceNeeded = 0
-		for k, v in pairs(t) do
-			if (v.flags == nil) then
-				v.flags = TYPE_DWORD
-			end
-			spaceNeeded = spaceNeeded + v.flags
-		end
-
-		if spaceNeeded > 4096 then
-			explorer.print('🔴 memory.write: not enough free space in page (4096 bytes) to write the whole table with size ' .. spaceNeeded .. ' bytes')
-			return false
-		end
-		if (spaceNeeded > freeSpace) then
-			memory.alloc()
-		end
-
-		if #t > 4096 then
-			explorer.print('🔴 memory.write: not enough free space to write the whole table')
-			return false
-		end
-
-		for k, v in pairs(t) do
-			v.address = currentAddr
-			t[k] = v
-			currAddr = currAddr + v.flags
-			freeSpace = freeSpace - v.flags
-		end
-		local res = gg.setValues(t)
-		if type(res) ~= 'boolean' then
-			explorer.print('🔴 memory.write: error while writing')
-			explorer.print(res)
-			return false
-		end
-		explorer.print('🟢 memory.write: free sapce left ' .. freeSpace)
-		return true
+		spaceNeeded = spaceNeeded + v.flags
 	end
 
-	--it doesn't actually *free* memory but let reuse already allocated pages
-	function free()
-		if (page[0] == nil) then
-			return
-		end
-		currAddr = page[0]
+	if spaceNeeded > 4096 then
+		explorer.print('🔴 memory.write: not enough free space in page (4096 bytes) to write the whole table with size ' ..
+						               spaceNeeded .. ' bytes')
+		return false
 	end
-}
+	if (spaceNeeded > freeSpace) then
+		memory.alloc()
+	end
+
+	if #t > 4096 then
+		explorer.print('🔴 memory.write: not enough free space to write the whole table')
+		return false
+	end
+
+	for k, v in pairs(t) do
+		v.address = currentAddr
+		t[k] = v
+		currAddr = currAddr + v.flags
+		freeSpace = freeSpace - v.flags
+	end
+	local res = gg.setValues(t)
+	if type(res) ~= 'boolean' then
+		explorer.print('🔴 memory.write: error while writing')
+		explorer.print(res)
+		return false
+	end
+	explorer.print('🟢 memory.write: free sapce left ' .. freeSpace)
+	return true
+end
+
+-- it doesn't actually *free* memory but let reuse already allocated pages
+function memory.free()
+	if (page[0] == nil) then
+		return
+	end
+	currAddr = page[0]
+end
