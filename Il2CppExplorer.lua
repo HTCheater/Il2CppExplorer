@@ -545,14 +545,14 @@ function explorer.setAlphabet(str)
 end
 
 memory = {}
-local currentAddr = nil
+local currentAddress = nil
 local freeSpace = nil
 local pages = {}
 local pageIndex = 0
 
 -- in case someone needs access to this fields
 
-function memory.getCurrentAddress()
+function memory.getcurrentAddressess()
 	return currAddr
 end
 
@@ -568,16 +568,16 @@ function memory.alloc()
 	if (pageIndex < #pages) then
 		pageIndex = pageIndex + 1
 		freeSpace = 4096
-		currentAddr = pages[pageIndex]
-		explorer.print('🟢 memory.alloc: reused page ' .. string.format('%X', currentAddr))
+		currentAddress = pages[pageIndex]
+		explorer.print('🟢 memory.alloc: reused page ' .. string.format('%X', currentAddress))
 		return pages[pageIndex]
 	end
 	local ptr = gg.allocatePage(gg.PROT_READ | gg.PROT_WRITE | gg.PROT_EXEC)
-	currentAddr = ptr
+	currentAddress = ptr
 	freeSpace = 4096
 	pageIndex = pageIndex + 1
 	pages[pageIndex] = ptr
-	explorer.print('🟢 memory.alloc: allocated page ' .. string.format('%X', currentAddr))
+	explorer.print('🟢 memory.alloc: allocated page ' .. string.format('%X', currentAddress))
 	return ptr
 end
 
@@ -594,7 +594,7 @@ function memory.write(t)
 	local spaceNeeded = 0
 	for k, v in pairs(t) do
 		if (v.flags == nil) then
-			v.flags = TYPE_DWORD
+			v.flags = gg.TYPE_DWORD
 			t[k] = v
 		end
 		spaceNeeded = spaceNeeded + v.flags
@@ -614,10 +614,10 @@ function memory.write(t)
 		return false
 	end
 
-	for k, v in pairs(t) do
-		v.address = currentAddr
+	for k, v in ipairs(t) do
+		v.address = currentAddress
 		t[k] = v
-		currAddr = currAddr + v.flags
+		currentAddress = currentAddress + v.flags
 		freeSpace = freeSpace - v.flags
 	end
 	local res = gg.setValues(t)
