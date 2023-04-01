@@ -51,9 +51,9 @@ string.removeStart = function(str, rem)
 	return (str:gsub('^' .. rem .. '(.-)$', '%1'))
 end
 
--- some functions
 local isx64 = gg.getTargetInfo().x64
 local metadata = gg.getRangesList('global-metadata.dat')
+local TYPE_PTR = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
 
 if #metadata > 0 then
 	metadata = metadata[1]
@@ -72,7 +72,7 @@ function explorer.isClassPointer(address)
 	local t = {}
 	t[1] = {}
 	t[1].address = address - (isx64 and 0x10 or 0x8)
-	t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+	t[1].flags = TYPE_PTR
 	gg.clearResults()
 	gg.loadResults(t)
 	t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, gg.POINTER_WRITABLE)
@@ -81,7 +81,7 @@ function explorer.isClassPointer(address)
 	end
 
 	t[1].address = address - (isx64 and 0x8 or 0x4)
-	t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+	t[1].flags = TYPE_PTR
 	gg.clearResults()
 	gg.loadResults(t)
 	t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, gg.POINTER_NO)
@@ -90,7 +90,7 @@ function explorer.isClassPointer(address)
 	end
 
 	t[1].address = address + (isx64 and 0x8 or 0x4)
-	t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+	t[1].flags = TYPE_PTR
 	gg.clearResults()
 	gg.loadResults(t)
 	t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, gg.POINTER_READ_ONLY)
@@ -100,13 +100,12 @@ function explorer.isClassPointer(address)
 	return true
 end
 
--- Get instances of class. Returns table with search results or empty table.
-
-function explorer.getInstances(classname)
+function explorer.getClassMetadataPtr(classname)
 	if type(classname) ~= 'string' then
-		explorer.print('🔴 explorer.getInstances: expected string for parameter classname, got ' .. type(classname))
+		explorer.print('🔴 explorer.getClassMetadataPtr: expected string for parameter classname, got ' .. type(classname))
 		return {}
 	end
+
 	explorer.setAllRanges()
 	gg.clearResults()
 	local stringBytes = gg.bytes(classname, 'UTF-8')
@@ -118,28 +117,27 @@ function explorer.getInstances(classname)
 
 	gg.searchNumber(searchStr, gg.TYPE_BYTE, false, gg.SIGN_EQUAL, metadata.start, metadata['end'], 2)
 
-	if gg.getResultsCount() < 1 then
+	if gg.getResultsCount() < 2 then
 		if debug then
-			print('🔴 explorer.getInstances: can\'t find ' .. classname .. ' in metadata')
+			print('🔴 explorer.getClassMetadataPtr: can\'t find ' .. classname .. ' in metadata')
 		end
-		local r = {}
-		return r
+		return 0
 	end
-	local r = {}
-	r[1] = gg.getResults(2)[2]
+	return gg.getResults(2)[2].address
+end
 
+function explorer.getAllocatedClassPtr(metadataPtr)
 	local addr = 0x0
 	for k, v in pairs(gg.getRangesList('libc_malloc')) do
 		gg.clearResults()
-		gg.searchNumber(string.format('%X', r[1].address) .. 'h', isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD, false, gg.SIGN_EQUAL,
-		                v.start, v['end'], 0)
+		gg.searchNumber(string.format('%X', metadataPtr) .. 'h', TYPE_PTR, false, gg.SIGN_EQUAL, v.start, v['end'], 0)
 
-		local results = gg.getResults(100)
+		local results = gg.getResults(100000)
 		gg.clearResults()
 
 		for i, res in ipairs(results) do
-			if explorer.isClassPointer(res.address) == true then
-				addr = res.address
+			if explorer.isClassPointer(res.address) then
+				addr = res.address - (isx64 and 0x10 or 0x8)
 				break
 			end
 		end
@@ -147,24 +145,33 @@ function explorer.getInstances(classname)
 			break
 		end
 	end
-	if addr == 0 then
-		if debug then
-			explorer.print('🔴 explorer.getInstances: there is no valid pointer for ' .. classname)
-		end
-		local r = {}
-		return r
+	if (debug and (addr == 0)) then
+		explorer.print('🔴 explorer.getAllocatedClassPtr: there is no valid pointer for ' .. string.format('%X', metadataPtr))
 	end
+	return addr
+end
 
+-- Get instances of class. Returns table with search results or empty table.
+
+function explorer.getInstances(className)
+	local mPtr = explorer.getClassMetadataPtr(className)
+	if ((mPtr == 0) or (mPtr == nil)) then
+		return {}
+	end
+	local allocPtr = explorer.getAllocatedClassPtr(mPtr)
+	if (allocPtr == 0) then
+		return {}
+	end
 	gg.setRanges(gg.REGION_ANONYMOUS)
-	gg.loadResults(gg.getResults(1))
-	r = {}
+	gg.clearResults()
+	local r = {}
 	r[1] = {}
-	r[1].address = addr - (isx64 and 0x10 or 0x8)
-	r[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+	r[1].address = allocPtr
+	r[1].flags = TYPE_PTR
 	gg.loadResults(r)
 	gg.searchPointer(0)
 	r = gg.getResults(100000)
-	if gg.getResultsCount() == 0 and debug then
+	if ((#r == 0) and debug) then
 		explorer.print('🔴 explorer.getInstances: there are no instances for the ' .. classname .. ', try to load the class first')
 	end
 	gg.clearResults()
@@ -252,7 +259,7 @@ function explorer.getLib()
 					local t = {}
 					t[1] = {}
 					t[1].address = res.address - (isx64 and 0x8 or 0x4)
-					t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+					t[1].flags = TYPE_PTR
 					gg.loadResults(t)
 					local pointers = gg.getResults(1, 0, nil, nil, nil, nil, nil, nil, gg.POINTER_EXECUTABLE)
 					if #pointers ~= 0 then
@@ -362,8 +369,7 @@ function explorer.getFunction(className, functionName)
 	for index, result in pairs(gg.getResults(100000)) do
 		for k, v in pairs(gg.getRangesList('libc_malloc')) do
 			gg.clearResults()
-			gg.searchNumber(string.format('%X', result.address) .. 'h', isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD, false, gg.SIGN_EQUAL,
-			                v.start, v['end'], 0)
+			gg.searchNumber(string.format('%X', result.address) .. 'h', TYPE_PTR, false, gg.SIGN_EQUAL, v.start, v['end'], 0)
 
 			local results = gg.getResults(100)
 			gg.clearResults()
@@ -419,7 +425,7 @@ function explorer.isFunctionPointer(address, className)
 	local t = {}
 	t[1] = {}
 	t[1].address = address - (isx64 and 0x10 or 0x8)
-	t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+	t[1].flags = TYPE_PTR
 	gg.clearResults()
 	gg.loadResults(t)
 	t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, gg.POINTER_EXECUTABLE)
@@ -428,7 +434,7 @@ function explorer.isFunctionPointer(address, className)
 	end
 
 	t[1].address = address - (isx64 and 0x8 or 0x4)
-	t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+	t[1].flags = TYPE_PTR
 	gg.clearResults()
 	gg.loadResults(t)
 	t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, gg.POINTER_EXECUTABLE)
@@ -437,7 +443,7 @@ function explorer.isFunctionPointer(address, className)
 	end
 
 	t[1].address = address + (isx64 and 0x8 or 0x4)
-	t[1].flags = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
+	t[1].flags = TYPE_PTR
 	gg.clearResults()
 	gg.loadResults(t)
 	t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, gg.POINTER_WRITABLE)
@@ -491,7 +497,7 @@ end
 
 -- returns pointed address
 function explorer.readPointer(addr)
-	return explorer.readValue(addr, isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD)
+	return explorer.readValue(addr, TYPE_PTR)
 end
 
 -- Print debug messages
@@ -594,7 +600,7 @@ function memory.write(t)
 	local spaceNeeded = 0
 	for k, v in pairs(t) do
 		if (v.flags == nil) then
-			v.flags = (math.type(v.value) == "float") and gg.TYPE_FLOAT or gg.TYPE_DWORD
+			v.flags = (math.type(v.value) == 'float') and gg.TYPE_FLOAT or gg.TYPE_DWORD
 			t[k] = v
 		end
 		spaceNeeded = spaceNeeded + v.flags
