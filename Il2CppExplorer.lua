@@ -524,7 +524,7 @@ function explorer.readString(addr)
 		strTable[i].flags = gg.TYPE_WORD
 	end
 	--reading all string at once is faster than reading characters one by one
-	gg.getValues(strTable)
+	strTable = gg.getValues(strTable)
 	local str = ''
 	for k, v in ipairs(strTable) do
 		local c = v.value
