@@ -630,6 +630,12 @@ memory = {
 			currAddr = currAddr + v.flags
 			freeSpace = freeSpace - v.flags
 		end
+		local res = gg.setValues(t)
+		if type(res) ~= 'boolean' then
+			explorer.print('🔴 memory.write: error while writing')
+			explorer.print(res)
+			return false
+		end
 		explorer.print('🟢 memory.write: free sapce left ' .. freeSpace)
 		return true
 	end
