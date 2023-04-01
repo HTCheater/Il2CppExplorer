@@ -595,6 +595,7 @@ function memory.write(t)
 	for k, v in pairs(t) do
 		if (v.flags == nil) then
 			v.flags = TYPE_DWORD
+			t[k] = v
 		end
 		spaceNeeded = spaceNeeded + v.flags
 	end
