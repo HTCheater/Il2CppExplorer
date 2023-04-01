@@ -517,9 +517,17 @@ function explorer.readString(addr)
 	if len > explorer.maxStringLength then
 		return ''
 	end
+	local strTable = {}
+	for i = 1, len do
+		strTable[i] = {}
+		strTable[i].address = addr + (isx64 and 0x14 or 0xC) + (2 * (i - 1))
+		strTable[i].flags = gg.TYPE_WORD
+	end
+	--reading all string at once is faster than reading characters one by one
+	gg.getValues(strTable)
 	local str = ''
-	for i = 1, len, 1 do
-		local c = explorer.readShort(addr + (isx64 and 0x14 or 0xC) + (2 * (i - 1)))
+	for k, v in ipairs(strTable) do
+		local c = v.value
 		if (c > -1 and c < 129) then
 			str = str .. string.char(c) -- works from 0 to 128
 		else
