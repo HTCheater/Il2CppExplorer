@@ -594,7 +594,7 @@ function memory.write(t)
 	local spaceNeeded = 0
 	for k, v in pairs(t) do
 		if (v.flags == nil) then
-			v.flags = gg.TYPE_DWORD
+			v.flags = (math.type(v.value) == "float") and gg.TYPE_FLOAT or gg.TYPE_DWORD
 			t[k] = v
 		end
 		spaceNeeded = spaceNeeded + v.flags
