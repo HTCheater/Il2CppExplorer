@@ -180,8 +180,8 @@ Read string at desired address. If string length is too large, returns empty str
 local isx64 = gg.getTargetInfo().x64
 local ptrLength = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
 local instances = explorer.getInstances('ClassWithStringField')
-local ptr = explorer.getField(instances, 0x10, 0x8, ptrLength, 1) --get pointed address
-local str = explorer.readString(address)
+local ptr = explorer.getField(instances, 0x10, 0x8, ptrLength, 1)
+local str = explorer.readString(ptr)
 print(str)
 ```
 
@@ -194,15 +194,15 @@ To read read non-ASCII characters you need to call this function.
 local isx64 = gg.getTargetInfo().x64
 local ptrLength = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
 local instances = explorer.getInstances('ClassWithStringField')
-local ptr = explorer.getField(instances, 0x10, 0x8, ptrLength, 1) --get pointed address
+local ptr = explorer.getField(instances, 0x10, 0x8, ptrLength, 1)
 
 --attemp to read string "бамбетель" without setting alphabet
 --if explorer.debug is true, you will get warnings with missing UTF-16LE character codes
-local str = explorer.readString(address)
+local str = explorer.readString(ptr)
 print(str) --result is an empty string
 explorer.setAlphabet('АаБбВвГгҐґДдЕеЄєЖжЗзИиІіЇїЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщьЮюЯя') --ASCII characters included automatically
 --attemp to read "бамбетель" after setting alphabet
-str = explorer.readString(address)
+str = explorer.readString(ptr)
 print(str) --result is "бамбетель"
 ```
 # Contributing
