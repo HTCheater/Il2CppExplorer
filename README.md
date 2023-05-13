@@ -178,7 +178,7 @@ Read string at desired address. If string length is too large, returns empty str
 local isx64 = gg.getTargetInfo().x64
 local ptrLength = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
 local instances = explorer.getInstances('ClassWithStringField')
-local ptr = explorer.getField(instances, 0x10, 0x8, ptrLength, 1)
+local ptr = explorer.getField(instances[1], 0x10, 0x8, ptrLength, 1)
 local str = explorer.readString(ptr)
 print(str)
 ```
@@ -192,7 +192,7 @@ To read read non-ASCII characters you need to call this function.
 local isx64 = gg.getTargetInfo().x64
 local ptrLength = isx64 and gg.TYPE_QWORD or gg.TYPE_DWORD
 local instances = explorer.getInstances('ClassWithStringField')
-local ptr = explorer.getField(instances, 0x10, 0x8, ptrLength, 1)
+local ptr = explorer.getField(instances[1], 0x10, 0x8, ptrLength, 1)
 
 --attemp to read string "бамбетель" without setting alphabet
 --if explorer.debug is true, you will get warnings with missing UTF-16LE character codes
