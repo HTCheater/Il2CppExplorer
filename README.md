@@ -107,7 +107,6 @@ Get field's value
 2nd parameter is offset for 64-bit architecture  
 3rd parameter is offset for 32-bit architecture  
 4th parameter is one of gg.TYPE_\*  
-5th parameter is desired index  
 **Example:**
 ```lua
 explorer.getField(explorer.getInstances('RGHand')[1], 0x10, 0x8, gg.TYPE_DWORD)
@@ -119,8 +118,7 @@ Edit field's value
 2nd parameter is offset for 64-bit architecture  
 3rd parameter is offset for 32-bit architecture  
 4th parameter is one of gg.TYPE_\*  
-5th parameter is desired index  
-6th parameter is value to set  
+5th parameter is value to set  
 **Example:**
 ```lua
 explorer.editField(explorer.getInstances('RGHand')[1], 0x10, 0x8, gg.TYPE_DWORD, 99999)
