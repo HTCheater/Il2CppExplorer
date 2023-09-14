@@ -1,6 +1,6 @@
 # Il2CppExplorer
 
-Il2CppExplorer is a [Game Guardian](https://gameguardian.net/download) framework which is designed to make script creation for games built with Unity easier. To get function and class names and more get [Il2CppDumper](https://github.com/Perfare/Il2CppDumper)
+Il2CppExplorer is a library for [Game Guardian](https://gameguardian.net/download) scripts which is designed to make script creation for games built with Unity easier. To get function and class names and more get [Il2CppDumper](https://github.com/Perfare/Il2CppDumper)
 
 ## Installation
 
