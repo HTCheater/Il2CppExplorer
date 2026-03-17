@@ -1,3 +1,6 @@
+# Not maintained
+I quickly came to realization that GG API is very limited for what I aimed to do, so I am no longer interested in developing this.
+
 # Il2CppExplorer
 
 Il2CppExplorer is a library for [Game Guardian](https://gameguardian.net/download) scripts which is designed to make script creation for games built with Unity easier. To get function and class names and more get [Il2CppDumper](https://github.com/Perfare/Il2CppDumper)
